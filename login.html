@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<!-- 상단 헤더-->
+<div>
+    <a href="/">홈으로 돌아가기</a>
+</div>
+
+<!-- 로그인 폼 -->
+<form action="/login" method="post">
+    <h2>로그인 페이지</h2>
+    <div>
+        <label for="userID">아이디
+            <input type="text" id="userID" name="userID">   <!-- 서버로 데이터를 전송하기 위해서 name 속성 필요-->
+        </label>
+    </div>
+    <div>
+        <label for="userPW">비밀번호
+            <input type="password" id="userPW" name="userPW">
+        </label>
+    </div>
+    <div>
+        <button>로그인</button>
+    </div>
+    <!--    틀렸을 때 에러메세지 -->
+    <div th:if="${errorMessage}" style="color: red; ">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <div>
+        <a href="/register">회원가입하기</a>
+    </div>
+</form>
+
+</body>
+</html>
