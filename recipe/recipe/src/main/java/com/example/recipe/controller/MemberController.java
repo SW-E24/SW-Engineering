@@ -23,7 +23,8 @@ import java.util.Optional;
  * */
 
 
-@RestController
+//@RestController
+@Controller
 @RequestMapping("/api/members")
 public class MemberController {
 
@@ -62,8 +63,12 @@ public class MemberController {
     }
 
     // 회원가입
+    @GetMapping("/register")
+    public String showRegisterForm() {
+        return "register";
+    }
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody Member newMember, @RequestParam String confirmuwerPW,RedirectAttributes redirectAttributes) {
+    public ResponseEntity<String> register(@RequestBody Member newMember, @RequestParam String confirmuserPW,RedirectAttributes redirectAttributes) {
 
         //중복 아이디 확인
         if (memberService.isDuplicateUser(newMember.getUserID())) {
@@ -80,7 +85,7 @@ public class MemberController {
 
 
         // 비밀번호 확인
-        if (!newMember.getUserPW().equals(confirmuwerPW)) {
+        if (!newMember.getUserPW().equals(confirmuserPW)) {
             return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
         }
 
@@ -97,6 +102,10 @@ public class MemberController {
     /********************
      * 로그인 로직 처리
      * ******************/
+    @GetMapping("/login")
+    public String loginPage(Model model) {
+        return "/login";
+    }
     @PostMapping("/login")
     public String login(@RequestParam String userID, @RequestParam String userPW, HttpSession session, RedirectAttributes redirectAttributes) {
         Member member = memberRepository.findById(userID).orElseThrow(() -> new RuntimeException("아이디가 존재하지 않습니다."));
@@ -106,7 +115,7 @@ public class MemberController {
             return "redirect:/mypage"; // 로그인 성공 시 mypage 페이지로 이동
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "아이디 또는 비밀번호가 틀립니다."); // 로그인 실패 시 메시지 출력
-            return "redirect:/login";
+            return "redirect:/login"; // 로그인 실패 시 다시 로그인 페이지로 이동
         }
     }
 

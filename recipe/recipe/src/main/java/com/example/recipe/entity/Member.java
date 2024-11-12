@@ -6,10 +6,10 @@ package com.example.recipe.entity;
 
 import jakarta.persistence.*;
 
-//@Entity
-//@Table(name = "user_table")
+@Entity
+@Table(name = "user_table")
 public class Member {
-//    @Id
+    @Id
 
     // 속성 정의
     private String userID;
@@ -17,11 +17,6 @@ public class Member {
     private String userName;
     private String userEmail;
     private String userPhone;
-
-//    rank로 이동
-//    private GradeType grade;
-//    private int postCount;
-//    private int commentCount;
 
     // 생성자
     public Member(){}
@@ -34,7 +29,6 @@ public class Member {
     }
 
     //Getter and Setter
-
     public String getUserID() {
         return userID;
     }

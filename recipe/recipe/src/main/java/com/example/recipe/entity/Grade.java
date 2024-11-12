@@ -1,6 +1,11 @@
 package com.example.recipe.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class Grade {
+    @Id
     // 속성 정의
     private String userID;
     private GradeType grade;

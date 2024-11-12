@@ -66,90 +66,57 @@
       color: red;
     }
   </style>
-  <script>
-    const registeredUsers = ['user1', 'user2'];
-    const registeredNicknames = ['nickname1', 'nickname2'];
-    const registeredEmails = ['test1@example.com', 'test2@example.com'];
-
-    function checkDuplicate(type) {
-      const value = document.getElementById(type).value;
-      const exists = type === 'id' ? registeredUsers.includes(value) :
-              type === 'nickname' ? registeredNicknames.includes(value) :
-                      registeredEmails.includes(value);
-
-      const messageElement = document.getElementById(type + "-error");
-
-      if (exists) {
-        messageElement.textContent = `${type === 'id' ? '아이디' : type === 'nickname' ? '닉네임' : '이메일'}가 이미 사용 중입니다.`;
-      } else {
-        messageElement.textContent = `${type === 'id' ? '아이디' : type === 'nickname' ? '닉네임' : '이메일'}를 사용할 수 있습니다.`;
-      }
-    }
-
-    function validatePassword(password) {
-      const hasValidLength = password.length >= 8;
-      const validCharacters = /^[a-zA-Z0-9!@#$%^&*]+$/.test(password);
-      return hasValidLength && validCharacters;
-    }
-
-    function updatePasswordRequirements(isValid) {
-      const requirementsElement = document.getElementById("password-requirements");
-      if (isValid) {
-        requirementsElement.classList.remove("invalid");
-      } else {
-        requirementsElement.classList.add("invalid");
-      }
-    }
-
-    function register() {
-      const password = document.getElementById("password").value;
-      const email = document.getElementById("email").value;
-
-      const isPasswordValid = validatePassword(password);
-      updatePasswordRequirements(isPasswordValid);
-
-      if (!isPasswordValid) {
-        document.getElementById("password-error").textContent = "비밀번호가 조건을 충족하지 않습니다.";
-      } else {
-        document.getElementById("password-error").textContent = "";
-        alert("회원가입 성공!");
-        window.location.href = "login.html";  // 회원가입 후 로그인 페이지로 이동
-      }
-    }
-  </script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="scripts.js"></script>
 </head>
 <body>
 <div class="banner">재료백과</div>
 
 <div class="register-container">
   <h2>회원 가입</h2>
-<!--  <form onsubmit="event.preventDefault(); register();">-->
-  <form action="/register" method="post">
+  <form action="/api/members/register" method="post">
+
     <div class="form-group">
       <label for="id">아이디</label>
       <input type="text" class="form-control" id="id" placeholder="아이디" required>
-      <button type="button" class="btn btn-secondary" onclick="checkDuplicate('id')">중복 확인</button>
-      <div id="id-error"></div>
+      <button type="button" class="btn btn-secondary" id="checkIdBtn">중복 확인</button>
+      <div id="idCheckMessage"></div>
     </div>
+
     <div class="form-group">
       <label for="nickname">닉네임</label>
       <input type="text" class="form-control" id="nickname" placeholder="닉네임" required>
-      <button type="button" class="btn btn-secondary" onclick="checkDuplicate('nickname')">중복 확인</button>
-      <div id="nickname-error"></div>
+<!--      <button type="button" class="btn btn-secondary">중복 확인</button>-->
+<!--      <div id="nickname-error"></div>-->
     </div>
+
     <div class="form-group">
       <label for="email">이메일</label>
       <input type="email" class="form-control" id="email" placeholder="이메일" required>
-      <button type="button" class="btn btn-secondary" onclick="checkDuplicate('email')">중복 확인</button>
-      <div id="email-error"></div>
+      <button type="button" class="btn btn-secondary" id="checkEmailBtn">중복 확인</button>
+      <div id="emailCheckMessage"></div>
     </div>
+
+    <div class="form-group">
+      <label for="phone">전화번호</label>
+      <input type="text" class="form-control" id="phone" placeholder="전화번호" required>
+      <button type="button" class="btn btn-secondary" id="checkPhoneBtn">중복 확인</button>
+      <div id="phoneCheckMessage"></div>
+    </div>
+
     <div class="form-group">
       <label for="password">비밀번호</label>
-      <input type="password" class="form-control" id="password" placeholder="비밀번호" required oninput="updatePasswordRequirements(validatePassword(this.value))">
-      <div id="password-requirements">비밀번호는 영문, 숫자, 특수문자를 사용해 8자 이상이어야 합니다.</div>
-      <div id="password-error"></div>
+      <input type="password" class="form-control" id="password" placeholder="비밀번호" required>
     </div>
+
+    <div class="form-group">
+      <label for="confirmuserPW">비밀번호 확인</label>
+      <input type="password" class="form-control" id="confirmuserPW" placeholder="비밀번호 확인" required>
+      <div id="pwErrorMessage"></div>
+    </div>
+
     <button type="submit" class="btn btn-primary">회원가입</button>
+
   </form>
 </div>
 </body>
