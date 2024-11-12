@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원 정보 수정</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    /* 배너 스타일 */
+    .banner {
+      background-color: #a0d8a0;
+      text-align: center;
+      padding: 100px 0;
+      font-size: 36px;
+      font-weight: bold;
+      color: white;
+    }
+
+    /* 메뉴바 스타일 */
+    .menu-bar {
+      background-color: #a0d8a0; /* 배너와 동일한 배경색 */
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-bar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* 메뉴 버튼 스타일 */
+    .menu-bar ul li {
+      padding: 0 15px;
+    }
+
+    .menu-bar ul li a {
+      background-color: #a0d8a0; /* 배너와 동일한 배경색 */
+      color: black; /* 메뉴 텍스트는 검정색 */
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .menu-bar ul li a:hover {
+      text-decoration: underline;
+    }
+
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+    }
+    .header {
+      background-color: #a0d8a0;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header a {
+      color: black;
+      font-size: 18px;
+      text-decoration: none;
+      padding: 0 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .profile-pic {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .profile-pic img {
+      border-radius: 50%;
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+<div class="banner">재료백과</div>
+
+<!-- 메뉴바 영역 -->
+<div class="menu-bar">
+  <!-- 왼쪽 메뉴 (홈, 게시판) -->
+  <ul>
+    <li><a href="index.html">홈</a></li>
+    <li><a href="board.html">게시판</a></li>
+  </ul>
+
+  <!-- 오른쪽 메뉴 -->
+  <ul>
+    <li><a href="index.html">로그아웃</a></li>
+    <li><a href="mypage.html">마이페이지</a></li>
+  </ul>
+</div>
+
+<div class="container">
+  <h2>회원 정보 수정</h2>
+
+  <div class="profile-pic">
+    <img src="https://via.placeholder.com/150" alt="프로필 이미지">
+  </div>
+  <button class="btn btn-secondary d-block mx-auto mb-4" onclick="document.getElementById('profile-pic-input').click();">프로필 사진 변경</button>
+  <input type="file" id="profile-pic-input" style="display:none;">
+
+  <form>
+    <div class="form-group">
+      <label for="nickname">닉네임</label>
+      <input type="text" class="form-control" id="edit-nickname">
+      <button type="button" class="btn btn-secondary mt-2" onclick="checkDuplicate('nickname')">중복 확인</button>
+      <div id="nickname-error" style="color:red;"></div>
+    </div>
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input type="email" class="form-control" id="edit-email">
+      <button type="button" class="btn btn-secondary mt-2" onclick="checkDuplicate('email')">중복 확인</button>
+      <div id="email-error" style="color:red;"></div>
+    </div>
+    <div class="form-group">
+      <label for="current-password">현재 비밀번호</label>
+      <input type="password" class="form-control" id="current-password">
+    </div>
+    <div class="form-group">
+      <label for="new-password">새 비밀번호</label>
+      <input type="password" class="form-control" id="new-password">
+    </div>
+    <div class="form-group">
+      <label for="confirm-password">새 비밀번호 확인</label>
+      <input type="password" class="form-control" id="confirm-password">
+      <div id="password-error" style="color:red;"></div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="saveChanges()">수정</button>
+  </form>
+</div>
+
+<script>
+  function checkDuplicate(type) {
+    const value = document.getElementById(`edit-${type}`).value;
+    const errorElement = document.getElementById(`${type}-error`);
+    if (type === 'nickname' && value === '중복닉네임') {
+      errorElement.textContent = '닉네임이 이미 사용 중입니다.';
+    } else if (type === 'email' && value === 'test@example.com') {
+      errorElement.textContent = '이메일이 이미 사용 중입니다.';
+    } else {
+      errorElement.textContent = '';
+    }
+  }
+
+  function saveChanges() {
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    if (newPassword !== confirmPassword) {
+      document.getElementById('password-error').textContent = '비밀번호가 일치하지 않습니다.';
+    } else {
+      alert('회원 정보가 수정되었습니다.');
+      window.location.href = 'mypage.html';  // 수정 후 마이페이지로 이동
+    }
+  }
+</script>
+</body>
+</html>
