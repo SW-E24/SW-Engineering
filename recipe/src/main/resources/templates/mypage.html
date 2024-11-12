@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마이페이지</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    /* 기본 레이아웃 설정 */
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+    }
+    /* 배너 스타일 */
+    .banner {
+      background-color: #a0d8a0;
+      text-align: center;
+      padding: 100px 0;
+      font-size: 36px;
+      font-weight: bold;
+      color: white;
+    }
+
+    /* 메뉴바 스타일 */
+    .menu-bar {
+      background-color: #a0d8a0; /* 배너와 동일한 배경색 */
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-bar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* 메뉴 버튼 스타일 */
+    .menu-bar ul li {
+      padding: 0 15px;
+    }
+
+    .menu-bar ul li a {
+      background-color: #a0d8a0; /* 배너와 동일한 배경색 */
+      color: black; /* 메뉴 텍스트는 검정색 */
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .menu-bar ul li a:hover {
+      text-decoration: underline;
+    }
+
+    .header a {
+      color: black;
+      font-size: 18px;
+      text-decoration: none;
+      padding: 0 20px;
+    }
+    .mypage-container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .profile-header img {
+      border-radius: 50%;
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+    }
+    .profile-header h2 {
+      margin-top: 20px;
+    }
+    .mypage-buttons {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    .mypage-buttons a {
+      display: block;
+      width: 45%;
+      margin-bottom: 15px;
+      padding: 15px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 16px;
+      text-decoration: none;
+    }
+    .mypage-buttons a:hover {
+      background-color: #0056b3;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+    .footer a {
+      font-size: 16px;
+      text-decoration: none;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+<div class="banner">재료백과</div>
+
+<!-- 메뉴바 영역 -->
+<div class="menu-bar">
+  <!-- 왼쪽 메뉴 (홈, 게시판) -->
+  <ul>
+    <li><a href="index.html">홈</a></li>
+    <li><a href="board.html">게시판</a></li>
+  </ul>
+
+  <!-- 오른쪽 메뉴 -->
+  <ul>
+    <li><a href="index.html">로그아웃</a></li>
+    <li><a href="mypage.html">마이페이지</a></li>
+  </ul>
+</div>
+
+<div class="mypage-container">
+  <div class="profile-header">
+    <img src="https://via.placeholder.com/150" alt="프로필 이미지">
+    <h2>닉네임</h2>
+    <p>등급: 일반 회원</p>
+  </div>
+
+  <div class="mypage-buttons">
+    <a href="profile.html">회원 정보 수정</a>
+    <a href="bookmark.html">북마크</a>
+    <a href="mypost.html">작성한 글</a>
+    <a href="liked.html">좋아요</a>
+  </div>
+</div>
+</body>
+</html>

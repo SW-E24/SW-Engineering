@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: #ff88d0;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #ff88d0;
+}
+
+/* 링크 */
+a {
+    /*display: block;*/
+    /*text-align: center;*/
+    margin-bottom: 20px;
+    color: #ff88d0;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* 중복 확인, 비밀번호 확인 버튼 스타일 */
+.inline-button {
+    width: auto;
+    padding: 5px 10px;
+    margin-top: 5px;
+    background-color: #ddd;
+    color: #333;
+}
+
+.inline-button:hover {
+    background-color: #ccc;
+}
+
+/* 반응형 웹을 위한 미디어 쿼리 */
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+
+    form {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .inline-button {
+        width: 100%;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        padding: 10px;
+    }
+}

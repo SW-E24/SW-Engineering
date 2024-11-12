@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>북마크</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* 배너 스타일 */
+        .banner {
+            background-color: #a0d8a0;
+            text-align: center;
+            padding: 100px 0;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* 메뉴바 스타일 */
+        .menu-bar {
+            background-color: #a0d8a0; /* 배너와 동일한 배경색 */
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-bar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        /* 메뉴 버튼 스타일 */
+        .menu-bar ul li {
+            padding: 0 15px;
+        }
+
+        .menu-bar ul li a {
+            background-color: #a0d8a0; /* 배너와 동일한 배경색 */
+            color: black; /* 메뉴 텍스트는 검정색 */
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .menu-bar ul li a:hover {
+            text-decoration: underline;
+        }
+
+        /* 북마크 목록 스타일 */
+        .like-list li {
+            padding: 10px;
+            background-color: #f1f1f1; /* 북마크 목록의 배경 */
+            margin-bottom: 10px;
+            border-radius: 5px;
+            color: black; /* 북마크 목록의 텍스트 색상 */
+        }
+
+        /* 기본 스타일 */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 푸터 스타일 */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .footer a {
+            font-size: 16px;
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div class="banner">재료백과</div>
+
+<!-- 메뉴바 영역 -->
+<div class="menu-bar">
+    <!-- 왼쪽 메뉴 (홈, 게시판) -->
+    <ul>
+        <li><a href="index.html">홈</a></li>
+        <li><a href="board.html">게시판</a></li>
+    </ul>
+
+    <!-- 오른쪽 메뉴 -->
+    <ul>
+        <li><a href="index.html">로그아웃</a></li>
+        <li><a href="mypage.html">마이페이지</a></li>
+    </ul>
+</div>
+
+<!-- 북마크 목록 -->
+<div class="container">
+    <h2>📌 북마크</h2>
+    <ul class="like-list"> <!-- 북마크 목록에 클래스 추가 -->
+        <li>레시피 1</li>
+        <li>레시피 2</li>
+        <li>레시피 3</li>
+    </ul>
+</div>
+</body>
+</html>
