@@ -1,48 +1,45 @@
 package com.example.recipe.entity;
 
-/*
-* 회원 관리
-* - 필요한 속성 : 아이디, 비밀번호, 이름, 이메일, 전화번호, 등급 */
-
 import jakarta.persistence.*;
 
-@Entity
-@Table(name = "user_table")
+@Entity // 테이블 이름을 user_table로 변경
 public class Member {
     @Id
+    @Column(name = "user_id")
+    private String userId; // 로그인 사용시 아이디 (PK)
 
-    // 속성 정의
-    private String userID;
-    private String userPW;
-    private String userName;
-    private String userEmail;
-    private String userPhone;
+    private String userName; // 사용자 닉네임
+    private String email; // 사용자 이메일
+    private String password; // 로그인 비밀번호
+    private String phone; // 사용자 전화번호
+    private Grade grade; // 사용자 등급
 
-    // 생성자
-    public Member(){}
-    public Member(String id, String password, String name, String email, String phone) {
-        this.userID = id;
-        this.userPW = password;
-        this.userName = name;
-        this.userEmail = email;
-        this.userPhone = phone;
+    @Lob
+    private byte[] profileImage;
+
+    // Getters and Setters
+    public byte[] getProfileImage() {
+        return profileImage;
     }
 
-    //Getter and Setter
-    public String getUserID() {
-        return userID;
+    public void setProfileImage(byte[] profileImage) {
+        this.profileImage = profileImage;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public Member() {
+        // 기본 생성자
     }
 
-    public String getUserPW() {
-        return userPW;
+    public Member(String userId) {
+        this.userId = userId;
     }
 
-    public void setUserPW(String userPW) {
-        this.userPW = userPW;
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUserName() {
@@ -53,19 +50,36 @@ public class Member {
         this.userName = userName;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getUserPhone() {
-        return userPhone;
+    public String getPassword() {
+        return password;
     }
 
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Grade getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Grade grade) {
+        this.grade = grade;
     }
 }
+
