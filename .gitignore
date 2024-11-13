@@ -1,0 +1,8 @@
+# macOS 관련 파일
+.DS_Store
+
+# IntelliJ IDEA 관련 파일
+recipe/.idea/
+
+# 혹은 모든 .idea 폴더를 제외하고 싶다면
+.idea/
