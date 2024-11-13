@@ -1,9 +1,11 @@
 package com.example.recipe.entity;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
-@Embeddable
+@Entity
 public class Grade {
+    @Id
     // 속성 정의
     private String userID;
     private GradeType grade;
@@ -47,5 +49,4 @@ public class Grade {
     public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
     }
-
 }
