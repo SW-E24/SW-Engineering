@@ -1,0 +1,31 @@
+# Gradle build directories
+/build/
+/out/
+
+# Gradle cache directories
+recipe/.gradle/
+
+# Gradle wrapper files
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
+
+# IDE specific files (추가적인 IDE 설정 무시)
+.idea/
+*.iml
+*.iws
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Log and temporary files
+*.log
+*.tmp
+
+# Other files to ignore
+*.swp
