@@ -23,8 +23,7 @@ import java.util.Optional;
  * */
 
 
-//@RestController
-@Controller
+@RestController
 @RequestMapping("/api/members")
 public class MemberController {
 
@@ -63,10 +62,6 @@ public class MemberController {
     }
 
     // 회원가입
-    @GetMapping("/register")
-    public String showRegisterForm() {
-        return "register";
-    }
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody Member newMember, @RequestParam String confirmuserPW,RedirectAttributes redirectAttributes) {
 
@@ -102,10 +97,6 @@ public class MemberController {
     /********************
      * 로그인 로직 처리
      * ******************/
-    @GetMapping("/login")
-    public String loginPage(Model model) {
-        return "/login";
-    }
     @PostMapping("/login")
     public String login(@RequestParam String userID, @RequestParam String userPW, HttpSession session, RedirectAttributes redirectAttributes) {
         Member member = memberRepository.findById(userID).orElseThrow(() -> new RuntimeException("아이디가 존재하지 않습니다."));

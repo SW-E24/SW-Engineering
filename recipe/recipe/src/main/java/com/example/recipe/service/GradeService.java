@@ -8,9 +8,14 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**********************************************************
- * 사용자 등급 업데이트 로직 - 게시글 수, 댓글 수가 변경될때마다 호출
- * **********************************************************/
+/**************************************
+ * 사용자 등급 관리 로직
+ * - 게시글 등록 시 count 증가 메소드
+ * - 게시글 삭제 시 count 감소 메소드
+ * - 댓글 등록 시 count 증가 메소드
+ * - 댓글 삭제 시 count 감소 메소드
+ * - 사용자 count 에 따른 등급 갱신 트랜잭션
+ * ***********************************/
 @Service
 public class GradeService {
 
@@ -19,6 +24,42 @@ public class GradeService {
 
     public void saveGrade(Grade grade) {
         gradeRepository.save(grade);
+    }
+
+    public void increasePostCount(String userID) {
+        Grade grade = gradeRepository.findByUserID(userID)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        grade.setPostCount(grade.getPostCount() + 1);
+        gradeRepository.save(grade);
+    }
+
+    public void decreasePostCount(String userID) {
+        Grade grade = gradeRepository.findByUserID(userID)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        if (grade.getPostCount() > 0) {
+            grade.setPostCount(grade.getPostCount() - 1);
+            gradeRepository.save(grade);
+        } else {
+            throw new IllegalStateException("postCount는 음수일 수 없습니다.");
+        }
+    }
+
+    public void increaseCommentCount(String userID) {
+        Grade grade = gradeRepository.findByUserID(userID)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        grade.setCommentCount(grade.getCommentCount() + 1);
+        gradeRepository.save(grade);
+    }
+
+    public void decreaseCommentCount(String userID) {
+        Grade grade = gradeRepository.findByUserID(userID)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        if (grade.getPostCount() > 0) {
+            grade.setCommentCount(grade.getCommentCount() - 1);
+            gradeRepository.save(grade);
+        } else {
+            throw new IllegalStateException("commentCount는 음수일 수 없습니다.");
+        }
     }
 
     @Transactional

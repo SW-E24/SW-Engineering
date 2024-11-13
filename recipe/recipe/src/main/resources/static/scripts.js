@@ -52,36 +52,44 @@ $(document).ready(function () {
         }
     });
 
-    // 비밀번호 입력 체크
-    $('#confirmuserPW').on('input', function () {
-        const password = $('#userPW').val();
-        const confirmPW = $(this).val();
-
-        if (password !== confirmPW) {
-            $('#pwErrorMessage').text('비밀번호가 일치하지 않습니다.');
-        } else {
-            $('#pwErrorMessage').text('');  //일치하면 메세지 안 띄우게 공백
-        }
-    });
-
     //회원가입 폼 제출 처리
     $('#registerForm').on('submit', function (event) {
         event.preventDefault();
-        const userID = $('#id').val();
-        const userEmail = $('#email').val();
-        const userPhone = $('#phone').val();
-        const userPW = $('#password').val();
+
+        const userData = {
+            userID: $('#id').val(),
+            userEmail: $('#email').val(),
+            userPhone: $('#phone').val(),
+            userPW: $('#password').val()
+        };
         const confirmPW = $('#confirmuserPW').val();
 
+        // 비밀번호 일치 확인
+        if (userData.userPW !== confirmPW) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
         // 데이터 전송
-        $.post('api/members/register', {userID, userEmail, userPhone, userPW}, function (response) {
-            if (response.success) {
-                alert('회원가입 성공!');
-                window.location.href = '/login';
-            } else {
-                alert('회원가입 실패: ' + response.message);
-            }
-        });
+        fetch('/api/members/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'  // JSON 형식으로 보내기
+            },
+            body: JSON.stringify(userData)  // 데이터를 JSON으로 변환
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('회원가입 성공!');
+                    window.location.href = '/login';
+                } else {
+                    alert('회원가입 실패: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('회원가입 오류:', error);
+            });
     });
 
 });
