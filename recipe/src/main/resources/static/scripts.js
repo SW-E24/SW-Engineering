@@ -8,7 +8,7 @@ $(document).ready(function () {
     $('#checkIdBtn').on('click', function () {
         const id = $('#userID').val();
         if (id) {   // 필드에 입력된 상태에만 중복 체크
-            $.get('/api/members/check-duplicate-id', {userID: id}, function (response) {
+            $.get('/api/auth/check-duplicate-id', {userID: id}, function (response) {
                 if (response) {
                     $('#idCheckMessage').text('사용 가능한 아이디입니다.').css('color', 'green');
                 } else {
@@ -24,7 +24,7 @@ $(document).ready(function () {
     $('#checkEmailBtn').on('click', function () {
         const email = $('#userEmail').val();
         if (email) {
-            $.get('api/members/check-duplicate-email', {userEmail: email}, function (response) {
+            $.get('api/auth/check-duplicate-email', {userEmail: email}, function (response) {
                 if (response) {
                     $('#emailCheckMessage').text('이미 사용 중인 이메일입니다.').css('color', 'red');
                 } else {
@@ -40,7 +40,7 @@ $(document).ready(function () {
     $('#checkPhoneBtn').on('click', function () {
         const userPhone = $('#userPhone').val();
         if (userPhone) {  // 전화번호가 입력된 경우에만 중복 체크
-            $.get('/api/members/check-duplicate-phone', {userPhone: userPhone}, function (response) {
+            $.get('/api/auth/check-duplicate-phone', {userPhone: userPhone}, function (response) {
                 if (response) {
                     $('#phoneCheckMessage').text('이미 사용 중인 전화번호입니다.').css('color', 'red');
                 } else {
@@ -71,7 +71,7 @@ $(document).ready(function () {
         }
 
         // 데이터 전송
-        fetch('/api/members/register', {
+        fetch('/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'  // JSON 형식으로 보내기

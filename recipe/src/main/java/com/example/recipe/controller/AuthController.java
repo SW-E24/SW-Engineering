@@ -4,16 +4,14 @@ import com.example.recipe.entity.Grade;
 import com.example.recipe.entity.GradeType;
 import com.example.recipe.entity.Member;
 import com.example.recipe.repository.MemberRepository;
+import com.example.recipe.service.AuthService;
 import com.example.recipe.service.GradeService;
 import com.example.recipe.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.util.Optional;
 
 /*
  * 회원 관리 요청을 처리하기 위한 컨트롤러
@@ -24,13 +22,15 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/members")
-public class MemberController {
+@RequestMapping("/api/auth")
+public class AuthController {
 
     @Autowired
     private MemberService memberService;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private AuthService authService;
     @Autowired
     private GradeService gradeService;
 
@@ -41,7 +41,7 @@ public class MemberController {
     // 아이디 중복 체크
     @GetMapping("/check-duplicate-id")
     public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String userID) {
-        boolean isDuplicate = memberService.isDuplicateUser(userID);
+        boolean isDuplicate = authService.isDuplicateUser(userID);
         return ResponseEntity.ok(isDuplicate);
     }
 
@@ -49,7 +49,7 @@ public class MemberController {
     @GetMapping("/check-duplicate-email")
     public ResponseEntity<Boolean> checkDuplicateEmail(@RequestParam String userEmail) {
         // 이메일 중복 여부 확인
-        boolean isDuplicate = memberService.isDuplicateEmail(userEmail);
+        boolean isDuplicate = authService.isDuplicateEmail(userEmail);
         return ResponseEntity.ok(isDuplicate);
     }
 
@@ -57,7 +57,7 @@ public class MemberController {
     @GetMapping("/check-duplicate-phone")
     public ResponseEntity<Boolean> checkDuplicatePhone(@RequestParam String userPhone) {
         // 전화번호 중복 여부 확인
-        boolean isDuplicate = memberService.isDuplicatePhone(userPhone);
+        boolean isDuplicate = authService.isDuplicatePhone(userPhone);
         return ResponseEntity.ok(isDuplicate);
     }
 
@@ -66,15 +66,15 @@ public class MemberController {
     public ResponseEntity<String> register(@RequestBody Member newMember, @RequestParam String confirmuserPW,RedirectAttributes redirectAttributes) {
 
         //중복 아이디 확인
-        if (memberService.isDuplicateUser(newMember.getUserID())) {
+        if (authService.isDuplicateUser(newMember.getUserID())) {
             return ResponseEntity.badRequest().body("이미 사용 중인 아이디입니다.");
         }
         // 이메일 중복 확인
-        if (memberService.isDuplicateEmail(newMember.getUserEmail())) {
+        if (authService.isDuplicateEmail(newMember.getUserEmail())) {
             return ResponseEntity.badRequest().body("이미 사용 중인 이메일입니다.");
         }
         // 전화번호 중복 확인
-        if (memberService.isDuplicatePhone(newMember.getUserPhone())) {
+        if (authService.isDuplicatePhone(newMember.getUserPhone())) {
             return ResponseEntity.badRequest().body("이미 사용 중인 전화번호입니다.");
         }
 

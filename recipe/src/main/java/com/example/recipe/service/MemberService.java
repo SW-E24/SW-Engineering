@@ -16,16 +16,4 @@ public class MemberService {
     public void saveMember(Member member) {
         memberRepository.save(member);
     }
-
-    public boolean isDuplicateUser(String userID) {
-        return memberRepository.existsByUserID(userID);
-    }
-
-    public boolean isDuplicateEmail(String userEmail) {
-        return memberRepository.existsByUserEmail(userEmail);
-    }
-
-    public boolean isDuplicatePhone(String userPhone) {
-        return memberRepository.existsByUserPhone(userPhone);
-    }
 }
