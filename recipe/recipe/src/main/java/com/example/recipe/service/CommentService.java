@@ -56,4 +56,8 @@ public class CommentService {
         // 레시피 ID로 댓글 조회
         return commentRepository.findByRecipeId(recipeId);
     }
+
+    public List<Comment> getCommentsByUserId(String userId) { //작성한 댓글을 조회하는 메서드
+        return commentRepository.findAllByUserId(userId);
+    }
 }

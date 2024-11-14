@@ -62,4 +62,10 @@ public class CommentController {
     public List<Comment> getCommentsByRecipeId(@RequestParam Long recipeId) {
         return commentService.getCommentsByRecipeId(recipeId);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Comment>> getUserComments(@PathVariable String userId) {
+        List<Comment> comments = commentService.getCommentsByUserId(userId);
+        return ResponseEntity.ok(comments);
+    }
 }

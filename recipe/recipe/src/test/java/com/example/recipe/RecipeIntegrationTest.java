@@ -184,12 +184,17 @@ public class RecipeIntegrationTest {
     }
 
     @Test
-    void testGetUserRecipes() throws Exception {
-        mockMvc.perform(get("/api/recipes/user/{userId}", testUser.getUserId()))
+    void testGetAllRecipes() throws Exception {
+        // `recipeRepository.findAll()`이 호출될 때 반환할 값 설정
+        Mockito.when(recipeRepository.findAll()).thenReturn(Arrays.asList(testRecipe));
+
+        mockMvc.perform(get("/api/recipes"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
                 .andExpect(jsonPath("$[0].title").value(testRecipe.getTitle()));
     }
+
 
     @Test
     void testGetUserComments() throws Exception {
@@ -216,15 +221,15 @@ public class RecipeIntegrationTest {
                 .andExpect(content().string("조회수가 증가했습니다."));
     }
 
-//    @Test
-//    void testGetUserLevel() throws Exception {
-//        mockMvc.perform(get("/api/users/{userId}/grade", testUser.getUserId()))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.userID").value(testUser.getGrade().getUserID()))
-//                .andExpect(jsonPath("$.grade").value(testUser.getGrade().getGrade().toString()))
-//                .andExpect(jsonPath("$.postCount").value(testUser.getGrade().getPostCount()))
-//                .andExpect(jsonPath("$.commentCount").value(testUser.getGrade().getCommentCount()));
-//    }
+    @Test
+    void testGetUserLevel() throws Exception {
+        mockMvc.perform(get("/api/users/{userId}/grade", testUser.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userID").value(testUser.getGrade().getUserID()))
+                .andExpect(jsonPath("$.grade").value(testUser.getGrade().getGrade().toString()))
+                .andExpect(jsonPath("$.postCount").value(testUser.getGrade().getPostCount()))
+                .andExpect(jsonPath("$.commentCount").value(testUser.getGrade().getCommentCount()));
+    }
 
     @Test
     void testGetMyPageInfo() throws Exception {
