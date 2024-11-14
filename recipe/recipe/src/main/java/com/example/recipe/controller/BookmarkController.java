@@ -22,14 +22,14 @@ public class BookmarkController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Bookmark>> getBookmarks(@PathVariable String userId) {
-        List<Bookmark> bookmarks = bookmarkService.getBookmarksByUserId(userId);
+    public ResponseEntity<List<Bookmark>> getBookmarks(@PathVariable String userID) {
+        List<Bookmark> bookmarks = bookmarkService.getBookmarksByUserID(userID);
         return ResponseEntity.ok(bookmarks);
     }
 
     @DeleteMapping("/{userId}/{recipeId}")
-    public ResponseEntity<Void> removeBookmark(@PathVariable String userId, @PathVariable Long recipeId) {
-        bookmarkService.removeBookmark(userId, recipeId);  // 북마크 취소 메소드 추가
+    public ResponseEntity<Void> removeBookmark(@PathVariable String userID, @PathVariable Long recipeId) {
+        bookmarkService.removeBookmark(userID, recipeId);  // 북마크 취소 메소드 추가
         return ResponseEntity.noContent().build();
     }
 }

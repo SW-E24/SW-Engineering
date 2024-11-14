@@ -8,17 +8,24 @@ import com.example.recipe.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
+
 
 @Service
 public class MemberService {
     @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    @Autowired
+    private final GradeService gradeService;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository, GradeService gradeService) {
         this.memberRepository = memberRepository;
+        this.gradeService = gradeService;
+    }
+
+    public void saveMember(Member member) {
+        memberRepository.save(member);
     }
 
     public void updateProfilePicture(String userId, MultipartFile file) throws IOException {
@@ -42,8 +49,8 @@ public class MemberService {
     public Member updateUser(String userId, Member updatedUser) { //유저 정보 업데이트 메소드
         Member user = getUserById(userId);
         user.setUserName(updatedUser.getUserName());
-        user.setEmail(updatedUser.getEmail());
-        user.setPhone(updatedUser.getPhone());
+        user.setUserEmail(updatedUser.getUserEmail());
+        user.setUserPhone(updatedUser.getUserPhone());
         return memberRepository.save(user);
     }
 
@@ -51,10 +58,9 @@ public class MemberService {
         return getUserById(userId); // 기존 메서드 활용
     }
 
-    public Grade getUserLevel(String userId) { //현재 등급 확인
-        Member user = getUserById(userId);
-        return user.getGrade();
+    public Grade getUserLevel(String userId) {
+        return gradeService.findByUserID(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User grade not found for id: " + userId));
     }
 
 }
-

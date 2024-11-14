@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
-    List<Bookmark> findAllByUserUserId(String userId);
+    List<Bookmark> findAllByUserUserID(String userID);
     //void deleteByUserUserIdAndRecipeRecipeId(String userId, Long recipeId);
-    Optional<Bookmark> findByUserUserIdAndRecipeRecipeId(String userId, Long recipeId);
+    Optional<Bookmark> findByUserUserIDAndRecipeRecipeId(String userID, Long recipeId);
 }

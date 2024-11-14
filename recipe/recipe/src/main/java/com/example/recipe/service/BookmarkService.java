@@ -26,8 +26,8 @@ public class BookmarkService {
 
     public Bookmark addBookmark(Bookmark bookmark) {
         // 사용자와 레시피를 데이터베이스에서 조회
-        Member user = memberRepository.findById(bookmark.getUser().getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + bookmark.getUser().getUserId()));
+        Member user = memberRepository.findById(bookmark.getUser().getUserID())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + bookmark.getUser().getUserID()));
 
         Recipe recipe = recipeRepository.findById(bookmark.getRecipe().getRecipeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + bookmark.getRecipe().getRecipeId()));
@@ -45,13 +45,13 @@ public class BookmarkService {
 //        return bookmarkRepository.save(bookmark);
 //    }
 
-    public List<Bookmark> getBookmarksByUserId(String userId) { //모든 북마크를 가져오는 메소드
-        return bookmarkRepository.findAllByUserUserId(userId);
+    public List<Bookmark> getBookmarksByUserID(String userID) { //모든 북마크를 가져오는 메소드
+        return bookmarkRepository.findAllByUserUserID(userID);
     }
 
-    public void removeBookmark(String userId, Long recipeId) { // 북마크 취소 메소드 추가
-        Bookmark bookmark = bookmarkRepository.findByUserUserIdAndRecipeRecipeId(userId, recipeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Bookmark not found for userId: " + userId + " and recipeId: " + recipeId));
+    public void removeBookmark(String userID, Long recipeId) { // 북마크 취소 메소드 추가
+        Bookmark bookmark = bookmarkRepository.findByUserUserIDAndRecipeRecipeId(userID, recipeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bookmark not found for userId: " + userID + " and recipeId: " + recipeId));
 
         bookmarkRepository.delete(bookmark);
     }
