@@ -1,5 +1,6 @@
 package com.example.recipe.service;
 
+import com.example.recipe.entity.Bookmark;
 import com.example.recipe.entity.Like;
 import com.example.recipe.entity.Member;
 import com.example.recipe.entity.Recipe;
@@ -8,6 +9,8 @@ import com.example.recipe.repository.RecipeRepository;
 import com.example.recipe.repository.MemberRepository;
 import com.example.recipe.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,5 +53,10 @@ public class LikeService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         // 좋아요 엔티티에 사용자 필드가 있으므로 해당 사용자가 좋아요한 모든 레시피 가져오기
         return likeRepository.findAllByUserUserId(userId);
+    }
+
+    // 페이지네이션 추가
+    public Page<Like> getLikesByUserIdWithPaging(String userId, Pageable pageable) {
+        return likeRepository.findAllByUserUserId(userId, pageable);
     }
 }

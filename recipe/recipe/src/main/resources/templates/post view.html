@@ -440,7 +440,7 @@
             .then(data => {
               const userId = data.userId;
 
-              // 좋아요 상태 확인
+              // 좋아요 상태 확인 - toggleLike 사용 시
               const isLiked = likeButton.classList.contains("active");
               const method = isLiked ? 'DELETE' : 'POST'; // 좋아요 토글 처리
 
@@ -450,7 +450,7 @@
               })
                       .then(response => {
                         if (response.ok) {
-                          likeButton.classList.toggle("active"); // UI 업데이트
+                          likeButton.classList.toggle("active"); // 버튼 상태 업데이트 구현 필요
                         } else {
                           alert('좋아요 처리 중 오류가 발생했습니다.');
                         }
@@ -463,9 +463,6 @@
               console.error('사용자 정보 가져오기 실패:', error);
             });
   }
-
-  // 좋아요 버튼 클릭 시에만 toggleLike 호출
-  document.getElementById("likeButton").addEventListener("click", toggleLike);
 
   function addComment() {
     const commentInput = document.getElementById("commentInput");
