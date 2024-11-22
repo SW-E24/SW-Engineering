@@ -3,6 +3,8 @@ package com.example.recipe.service;
 import com.example.recipe.entity.Comment;
 import com.example.recipe.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,5 +61,11 @@ public class CommentService {
 
     public List<Comment> getCommentsByUserId(String userId) {
         return commentRepository.findAllByUserId(userId);
+    }
+
+    // jiyeon
+    // 로그인한 사용자가 작성한 댓글을 페이지네이션하여 가져오기
+    public Page<Comment> getCommentsByUserIdPaged(String userId, Pageable pageable) {
+        return commentRepository.findAllByUserId(userId, pageable);
     }
 }

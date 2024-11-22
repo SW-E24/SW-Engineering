@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -110,12 +111,28 @@ public class RecipeController {
             return ResponseEntity.notFound().build();
         }
     }
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Recipe>> getRecipesByUserId(@PathVariable String userId) { // 특정 사용자의 레시피 조회
         List<Recipe> recipes = recipeService.getRecipesByUserId(userId);
         return ResponseEntity.ok(recipes);
+    }
+
+    /********
+    * jiyeon
+    * *******/
+    @GetMapping("/myposts")
+    public ResponseEntity<Page<Recipe>> getMyPosts(
+            HttpSession session,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Member currentUser = (Member) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Recipe> myPosts = recipeService.getRecipesByUserIdPaged(currentUser.getUserId(), pageable);
+        return ResponseEntity.ok(myPosts);
+    }
 
 }

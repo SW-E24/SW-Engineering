@@ -123,15 +123,15 @@
 <!-- 작성한 글 목록 -->
 <div class="container">
   <h2>✏️ 작성한 댓글</h2>
-  <ul class="like-list"> <!-- 좋아요 목록에 클래스 추가 -->
-    <li>댓글 1</li>
-    <li>댓글 2</li>
-    <li>댓글 3</li>
+  <ul class="like-list" id="commentList">
+    <!-- 댓글이 이곳에 동적으로 삽입됩니다 -->
   </ul>
+
+  <!-- 페이지네이션 버튼 -->
+  <div id="pagination" class="pagination justify-content-center"></div>
 
   <!-- 이전 버튼 -->
   <button class="back-btn" onclick="window.history.back()">이전</button>
-
 </div>
 
 <script>
@@ -172,6 +172,43 @@
               .catch(error => console.log('로그아웃 실패:', error));
     }
   });
+
+  // 댓글 불러오기 및 페이지네이션
+  let currentPage = 0;
+  const loadComments = (page = 0) => {
+    fetch(`/api/comments/my-comments-paged?page=${page}&size=5`)
+            .then(response => response.json())
+            .then(data => {
+              console.log('댓글 데이터:', data);
+              renderComments(data.content);
+              updatePagination(data.number, data.totalPages);
+            })
+            .catch(error => console.log('Error:', error));
+  };
+
+  const renderComments = (comments) => {
+    const commentList = document.getElementById('commentList');
+    commentList.innerHTML = '';
+    comments.forEach(comment => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${comment.content}`;
+      commentList.appendChild(listItem);
+    });
+  }
+
+  const updatePagination = (currentPage, totalPages) => {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    for (let i = 0; i < totalPages; i++) {
+      const button = document.createElement('button');
+      button.textContent = i + 1;
+      button.disabled = i === currentPage;
+      button.addEventListener('click', () => loadComments(i));
+      pagination.appendChild(button);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => loadComments(currentPage));
 </script>
 
 </body>

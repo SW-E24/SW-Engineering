@@ -39,7 +39,6 @@
 
         .menu-bar ul li a {
             background-color: #ffe69b; /* 배너와 동일한 배경색 */
-            color: black; /* 메뉴 텍스트는 검정색 */
             text-decoration: none;
             font-size: 18px;
         }
@@ -121,17 +120,13 @@
 </div>
 
 <!-- 작성한 글 목록 -->
-<div class="container">
+<<div class="container">
     <h2>✏️ 작성한 글</h2>
-    <ul class="like-list"> <!-- 좋아요 목록에 클래스 추가 -->
-        <li>게시글 1</li>
-        <li>게시글 2</li>
-        <li>게시글 3</li>
-    </ul>
-
-    <!-- 이전 버튼 -->
+    <ul id="postList" class="list-group"></ul>
+    <nav aria-label="Page navigation">
+        <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
     <button class="back-btn" onclick="window.history.back()">이전</button>
-
 </div>
 
 <script>
@@ -172,6 +167,46 @@
                 .catch(error => console.log('로그아웃 실패:', error));
         }
     });
+
+    //
+    function fetchMyPosts(page = 0) {
+        fetch(`/api/recipes/myposts?page=${page}&size=5`, {
+            method: 'GET',
+            credentials: 'same-origin',
+        })
+            .then(response => response.json())
+            .then(data => {
+                renderPosts(data.content);
+                renderPagination(data.number, data.totalPages);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function renderPosts(posts) {
+        const postList = document.getElementById('postList');
+        postList.innerHTML = '';
+        posts.forEach(post => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.innerHTML = `<a href="/post view?recipeId=${post.recipeId}">${post.title}</a>`;
+            postList.appendChild(listItem);
+        });
+    }
+
+    function renderPagination(currentPage, totalPages) {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        for (let i = 0; i < totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            pageItem.innerHTML = `<a class="page-link" href="#">${i + 1}</a>`;
+            pageItem.addEventListener('click', () => fetchMyPosts(i));
+            pagination.appendChild(pageItem);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => fetchMyPosts());
+</script>
 </script>
 </body>
 </html>

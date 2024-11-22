@@ -269,8 +269,8 @@
   </div>
 </div>
 
-  <!-- 이전 버튼 -->
-  <button class="back-btn" onclick="window.history.back()">이전</button>
+<!-- 이전 버튼 -->
+<button class="back-btn" onclick="window.history.back()">이전</button>
 
 <script>
   // 로그인 상태에 따라 상단 버튼이 바뀌도록 하는 로직
@@ -291,10 +291,44 @@
             document.getElementById('loginLink').setAttribute('href', '/api/auth/logout');
             document.getElementById('registerLink').textContent = '마이페이지';
             document.getElementById('registerLink').setAttribute('href', '/pages/mypage');
+
+            // 북마크 상태 확인 로직
+            const bookmarkButton = document.getElementById("bookmarkButton");
+            const recipeContainer = document.getElementById('recipeContainer');
+            const recipeId = recipeContainer.getAttribute('data-recipe-id');
+            const userId = data.userId;
+
+            // 해당 레시피가 이미 북마크되었는지 확인하는 API 호출
+            fetch(`/api/bookmarks/is-bookmarked?userId=${userId}&recipeId=${recipeId}`)
+                    .then(response => response.json())
+                    .then(isBookmarked => {
+                      if (isBookmarked) {
+                        bookmarkButton.classList.add("active"); // 북마크가 되어 있으면 버튼에 active 클래스 추가
+                      } else {
+                        bookmarkButton.classList.remove("active"); // 북마크가 되어 있지 않으면 active 클래스 제거
+                      }
+                    })
+                    .catch(error => {
+                      console.error('북마크 상태 확인 중 오류:', error);
+                    });
           })
           .catch(error => {
             console.log(error); // 에러 출력
           });
+
+  // 로그아웃 요청 처리 (로그아웃 버튼 클릭 시)
+  document.getElementById('loginLink').addEventListener('click', function(event) {
+    if (event.target.textContent === '로그아웃') {
+      fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'same-origin' // 동일한 출처로 쿠키를 포함한 요청
+      })
+              .then(() => {
+                location.reload(); // 로그아웃 후 페이지 새로고침
+              })
+              .catch(error => console.log('로그아웃 실패:', error));
+    }
+  });
 
   // 네이버 쇼핑 구매하러 가기 링크
   function goToPurchase(button) {
@@ -345,8 +379,8 @@
               const userId = data.userId;
 
               // 북마크 상태 확인
-              const isBookmarked = likeButton.classList.contains("active");
-              const method = isBookmarked ? 'DELETE' : 'POST';
+              const isBookmarked = bookmarkButton.classList.contains("active");
+              const method = isBookmarked ? 'DELETE' : 'POST'; // 이미 북마크 상태면 DELETE로 설정
 
               // 서버로 북마크 데이터 (Bookmark 객체 형태 - json) 전송
               const bookmark = {
@@ -354,6 +388,8 @@
                 recipe: { recipeId: recipeId },
                 date: new Date().toISOString()
               }
+
+              // 북마크 추가 또는 삭제 요청
               fetch(`/api/bookmarks`, {
                 method: method,
                 headers: {
@@ -363,13 +399,19 @@
               })
                       .then(response => {
                         if (response.ok) {
-                          bookmarkButton.classList.toggle("active"); // UI 업데이트
+                          if (method === 'DELETE') {
+                            // DELETE 요청이면 북마크 버튼 상태 비활성화
+                            bookmarkButton.classList.remove("active");
+                          } else {
+                            // POST 요청이면 북마크 버튼 상태 활성화
+                            bookmarkButton.classList.add("active");
+                          }
                         } else {
-                          alert('좋아요 처리 중 오류가 발생했습니다.');
+                          alert('북마크 처리 중 오류가 발생했습니다.');
                         }
                       })
                       .catch(error => {
-                        console.error('좋아요 요청 에러:', error);
+                        console.error('북마크 요청 에러:', error);
                       });
             })
             .catch(error => {
@@ -377,7 +419,7 @@
             });
   }
 
-
+  // 좋아요 버튼 누를 시 로직
   function toggleLike() {
     const likeButton = document.getElementById("likeButton");
     const recipeContainer = document.getElementById('recipeContainer');
@@ -422,6 +464,9 @@
             });
   }
 
+  // 좋아요 버튼 클릭 시에만 toggleLike 호출
+  document.getElementById("likeButton").addEventListener("click", toggleLike);
+
   function addComment() {
     const commentInput = document.getElementById("commentInput");
     const commentsList = document.getElementById("commentsList");
@@ -450,6 +495,7 @@
     }
   }
 </script>
+
 
 <script src="/scripts.js"></script>
 

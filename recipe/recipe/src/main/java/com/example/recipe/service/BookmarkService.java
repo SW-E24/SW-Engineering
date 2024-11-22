@@ -8,6 +8,8 @@ import com.example.recipe.ResourceNotFoundException;
 import com.example.recipe.repository.RecipeRepository;
 import com.example.recipe.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,7 +42,6 @@ public class BookmarkService {
         return bookmarkRepository.save(bookmark);
     }
 
-
     public List<Bookmark> getBookmarksByUserID(String userID) { //모든 북마크를 가져오는 메소드
         return bookmarkRepository.findAllByUserUserId(userID);
     }
@@ -48,7 +49,12 @@ public class BookmarkService {
     public void removeBookmark(String userID, Long recipeId) { // 북마크 취소 메소드 추가
         Bookmark bookmark = bookmarkRepository.findByUserUserIdAndRecipeRecipeId(userID, recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bookmark not found for userId: " + userID + " and recipeId: " + recipeId));
-
         bookmarkRepository.delete(bookmark);
+    }
+
+    // jiyeon
+    //페이지네이션
+    public Page<Bookmark> getBookmarksByUserIdWithPaging(String userId, Pageable pageable) {
+        return bookmarkRepository.findAllByUserUserId(userId, pageable);
     }
 }
