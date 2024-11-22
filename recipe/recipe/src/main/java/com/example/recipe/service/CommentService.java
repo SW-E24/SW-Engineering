@@ -1,5 +1,6 @@
 package com.example.recipe.service;
 
+import com.example.recipe.dto.CommentResponse;
 import com.example.recipe.entity.Comment;
 import com.example.recipe.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +55,8 @@ public class CommentService {
         }
     }
 
-    public List<Comment> getCommentsByRecipeId(Long recipeId) {
-        // 레시피 ID로 댓글 조회
-        return commentRepository.findByRecipeId(recipeId);
+    public List<CommentResponse> getCommentsByRecipeId(Long recipeId) {
+        return commentRepository.findCommentsByRecipeId(recipeId);
     }
 
     public List<Comment> getCommentsByUserId(String userId) {

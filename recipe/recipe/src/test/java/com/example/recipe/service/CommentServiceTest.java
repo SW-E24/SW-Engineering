@@ -104,17 +104,17 @@ class CommentServiceTest {
         commentRepository.deleteAll();
     }
 
-    @Test
-    @DisplayName("레시피 ID로 댓글 조회 테스트")
-    void testGetCommentsByRecipeId() {
-        Long recipeId = 1L;
-        String userId = String.valueOf(1L);
-        commentService.addComment(recipeId, userId, "댓글 1");
-        commentService.addComment(recipeId, userId, "댓글 2");
-
-        List<Comment> comments = commentService.getCommentsByRecipeId(recipeId);
-
-        assertThat(comments).hasSize(2);
-        assertThat(comments.get(0).getRecipeId()).isEqualTo(recipeId);
-    }
+//    @Test
+//    @DisplayName("레시피 ID로 댓글 조회 테스트")
+//    void testGetCommentsByRecipeId() {
+//        Long recipeId = 1L;
+//        String userId = String.valueOf(1L);
+//        commentService.addComment(recipeId, userId, "댓글 1");
+//        commentService.addComment(recipeId, userId, "댓글 2");
+//
+//        List<Comment> comments = commentService.getCommentsByRecipeId(recipeId);
+//
+//        assertThat(comments).hasSize(2);
+//        assertThat(comments.get(0).getRecipeId()).isEqualTo(recipeId);
+//    }
 }

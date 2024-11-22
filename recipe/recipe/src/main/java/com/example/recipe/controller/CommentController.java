@@ -1,6 +1,7 @@
 package com.example.recipe.controller;
 
 import com.example.recipe.dto.CommentRequest;
+import com.example.recipe.dto.CommentResponse;
 import com.example.recipe.entity.Comment;
 import com.example.recipe.entity.Member;
 import com.example.recipe.service.CommentService;
@@ -84,7 +85,7 @@ public class CommentController {
 
     // 특정 레시피의 댓글 목록 조회
     @GetMapping
-    public List<Comment> getCommentsByRecipeId(@RequestParam Long recipeId) {
+    public List<CommentResponse> getCommentsByRecipeId(@RequestParam Long recipeId) {
         return commentService.getCommentsByRecipeId(recipeId);
     }
 

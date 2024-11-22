@@ -464,33 +464,118 @@
             });
   }
 
+  // 댓글 추가 기능
   function addComment() {
     const commentInput = document.getElementById("commentInput");
     const commentsList = document.getElementById("commentsList");
     const commentCountElement = document.getElementById("commentCount");
 
     if (commentInput.value.trim() !== "") {
-      const commentItem = document.createElement("div");
-      commentItem.className = "comment-item";
+      // 로그인된 사용자 정보 가져오기
+      fetch('/api/auth/currentUser', {
+        method: 'GET',
+        credentials: 'same-origin' // 동일한 출처로 쿠키 포함
+      })
+              .then(response => {
+                if (response.status === 200) {
+                  return response.json(); // 로그인된 사용자 정보 반환
+                } else {
+                  throw new Error('로그인된 사용자가 없습니다.');
+                }
+              })
+              .then(data => {
+                const userId = data.userId; // 사용자 ID
+                const nickname = data.userName; // 사용자 닉네임
+                const recipeId = document.getElementById('recipeContainer').getAttribute('data-recipe-id'); // 레시피 ID
 
-      const nickname = document.createElement("div");
-      nickname.className = "comment-nickname";
-      nickname.textContent = "작성자 닉네임";
+                // 댓글 생성
+                const commentItem = document.createElement("div");
+                commentItem.className = "comment-item";
 
-      const commentText = document.createElement("div");
-      commentText.className = "comment-text";
-      commentText.textContent = commentInput.value;
+                const nicknameElement = document.createElement("div");
+                nicknameElement.className = "comment-nickname";
+                nicknameElement.textContent = nickname; // 닉네임 표시
 
-      commentItem.appendChild(nickname);
-      commentItem.appendChild(commentText);
-      commentsList.appendChild(commentItem);
+                const commentText = document.createElement("div");
+                commentText.className = "comment-text";
+                commentText.textContent = commentInput.value;
 
-      let commentCount = parseInt(commentCountElement.textContent);
-      commentCountElement.textContent = commentCount + 1;
+                commentItem.appendChild(nicknameElement);
+                commentItem.appendChild(commentText);
+                commentsList.appendChild(commentItem);
 
-      commentInput.value = "";
+                let commentCount = parseInt(commentCountElement.textContent);
+                commentCountElement.textContent = commentCount + 1;
+
+                // 댓글 데이터 서버로 전송 (레시피 ID, 사용자 ID, 댓글 내용)
+                const commentRequest = {
+                  recipeId: recipeId,
+                  content: commentInput.value
+                };
+
+                fetch('/api/comments/create', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(commentRequest)
+                })
+                        .then(response => {
+                          if (!response.ok) {
+                            alert("댓글 등록 중 오류가 발생했습니다.");
+                          }
+                        })
+                        .catch(error => {
+                          console.error("댓글 등록 실패:", error);
+                        });
+
+                commentInput.value = ""; // 댓글 입력창 초기화
+              })
+              .catch(error => {
+                console.error("사용자 정보 가져오기 실패:", error);
+              });
     }
   }
+
+  // 댓글 등록 버튼 클릭 시 addComment 함수 호출
+  document.querySelector("button[onclick='addComment()']").addEventListener("click", addComment);
+
+  // 댓글 로딩 함수 (페이지 로드 시 댓글 가져오기)
+  function loadComments() {
+    const recipeId = document.getElementById('recipeContainer').getAttribute('data-recipe-id');
+    fetch(`/api/comments?recipeId=${recipeId}`)
+            .then(response => response.json())
+            .then(comments => {
+              const commentsList = document.getElementById("commentsList");
+              commentsList.innerHTML = ""; // 기존 댓글 초기화
+              comments.forEach(comment => {
+                const commentItem = document.createElement("div");
+                commentItem.className = "comment-item";
+
+                const nicknameElement = document.createElement("div");
+                nicknameElement.className = "comment-nickname";
+                nicknameElement.textContent = comment.userName; // 서버에서 닉네임 받아옴
+
+                const commentText = document.createElement("div");
+                commentText.className = "comment-text";
+                commentText.textContent = comment.content;
+
+                commentItem.appendChild(nicknameElement);
+                commentItem.appendChild(commentText);
+                commentsList.appendChild(commentItem);
+              });
+
+              const commentCountElement = document.getElementById("commentCount");
+              commentCountElement.textContent = comments.length; // 댓글 수 업데이트
+            })
+            .catch(error => {
+              console.error("댓글 로딩 실패:", error);
+            });
+  }
+
+  // 페이지 로드 시 댓글 로드
+  loadComments();
+
 </script>
 
 
