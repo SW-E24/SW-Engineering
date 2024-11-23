@@ -537,9 +537,6 @@
     }
   }
 
-  // 댓글 등록 버튼 클릭 시 addComment 함수 호출
-  document.querySelector("button[onclick='addComment()']").addEventListener("click", addComment);
-
   // 댓글 로딩 함수 (페이지 로드 시 댓글 가져오기)
   function loadComments() {
     const recipeId = document.getElementById('recipeContainer').getAttribute('data-recipe-id');
