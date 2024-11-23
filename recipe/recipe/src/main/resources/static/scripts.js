@@ -111,7 +111,7 @@ $(document).ready(function () {
             const userId = data.userId;
             // const userPW = data.password;
             userPW = data.password;
-            document.getElementById('userIdDisplay').innerText = userName;
+            document.getElementById('userIdDisplay').innerText = userId;
         })
         .catch(error => {
             console.log(error);  // 에러 출력
