@@ -1,31 +1,33 @@
-# Gradle build directories
-/build/
-/out/
-
-# Gradle cache directories
-recipe/.gradle/
-
-# Gradle wrapper files
-/gradle/wrapper/gradle-wrapper.jar
-/gradle/wrapper/gradle-wrapper.properties
-
-# IDE specific files (추가적인 IDE 설정 무시)
-.idea/
-*.iml
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+### IntelliJ IDEA ###
+.idea
 *.iws
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+### VS Code ###
 .vscode/
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# Log and temporary files
-*.log
-*.tmp
-
-# Other files to ignore
-*.swp
