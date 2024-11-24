@@ -105,11 +105,11 @@
         <li><a href="/pages/board">게시판</a></li>
     </ul>
 
-        <!-- 오른쪽 메뉴 -->
-        <ul id="loginMenu">
-            <li><a href="/pages/login" id="loginLink">로그인</a></li>
-            <li><a href="/pages/register" id="registerLink">회원가입</a></li>
-        </ul>
+    <!-- 오른쪽 메뉴 -->
+    <ul id="loginMenu">
+        <li><a href="/pages/login" id="loginLink">로그인</a></li>
+        <li><a href="/pages/register" id="registerLink">회원가입</a></li>
+    </ul>
 </div>
 
 <div class="container">
@@ -163,6 +163,27 @@
     </form>
 </div>
 <script src="/scripts.js"></script>
+
+<script>
+    window.onload = function() {
+        // 로그인된 사용자 정보 가져오기
+        fetch('/api/auth/currentUser', {
+            method: 'GET',
+            credentials: 'same-origin' // 동일한 출처로 쿠키 포함
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 로그인된 사용자 정보가 있을 때 해당 정보를 입력 필드에 채워 넣음
+                document.getElementById('userIdDisplay').textContent = data.userId;
+                document.getElementById('nickname').value = data.userName;
+                document.getElementById('email').value = data.email;
+                document.getElementById('phone').value = data.phone;
+            })
+            .catch(error => {
+                console.error("사용자 정보 가져오기 실패:", error);
+            });
+    };
+</script>>
 
 <script>
     // 로그인 상태를 확인하는 fetch 요청
