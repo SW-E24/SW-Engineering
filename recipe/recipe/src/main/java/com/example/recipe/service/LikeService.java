@@ -26,16 +26,17 @@ public class LikeService {
     @Autowired
     private RecipeRepository recipeRepository;
 
-    public void addLike(String userId, Long recipeId) {
-        Member user = memberRepository.findById(userId)
+    public Like addLike(Like like) {
+        Member user = memberRepository.findById(like.getUser().getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Recipe recipe = recipeRepository.findById(recipeId)
+        Recipe recipe = recipeRepository.findById(like.getRecipe().getRecipeId())
                 .orElseThrow(() -> new RuntimeException("Recipe not found"));
 
-        Like like = new Like();
         like.setUser(user);
         like.setRecipe(recipe);
         likeRepository.save(like);
+
+        return likeRepository.save(like);
     }
 
     public void removeLike(String userID, Long recipeId) {

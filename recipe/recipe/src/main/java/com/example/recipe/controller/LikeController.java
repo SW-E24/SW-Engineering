@@ -1,5 +1,6 @@
 package com.example.recipe.controller;
 
+import com.example.recipe.ResourceNotFoundException;
 import com.example.recipe.entity.Like;
 import com.example.recipe.entity.Member;
 import com.example.recipe.repository.LikeRepository;
@@ -23,8 +24,33 @@ public class LikeController {
     @Autowired
     LikeRepository likeRepository;
 
+    @PostMapping
+    public ResponseEntity<Like> addLike(@RequestBody Like like) {
+        Like newLike = likeService.addLike(like);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newLike);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Like>> getLikes(@PathVariable String userId) {
+        List<Like> likes = likeService.getLikesByUserId(userId);
+        return ResponseEntity.ok(likes);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> removeLike(@RequestBody Like like) {
+        try {
+            likeService.removeLike(like.getUser().getUserId(), like.getRecipe().getRecipeId());
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
+
     // 메소드 관리 방법 1 - toggleLike 으로 add+remove 기능
     // html 에서 버튼 토글 구현 시 param 형태로 서버에 전송해야 한다. - 구현 필요
+    /*
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> toggleLike(@RequestParam String userId, @RequestParam Long recipeId) {
@@ -36,7 +62,7 @@ public class LikeController {
             likeService.removeLike(userId, recipeId);
         }
         return ResponseEntity.noContent().build();
-    }
+    }*/
 
     // 메소드 관리 방법 2 - add와 remove를 따로, id파라미터를 받기
     // 구현해보면 대충 아래 방법이겠지..? post view.html 도 id파라미터 전달하는걸로 스크립트 짜야함
@@ -81,17 +107,17 @@ public class LikeController {
     }
     */
 
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> checkLikeExists(@RequestParam String userId, @RequestParam Long recipeId) {
-        boolean exists = likeService.checkLikeExists(userId, recipeId);
-        return ResponseEntity.ok(exists);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Like>> getLikesByUserId(@PathVariable String userId) {
-        List<Like> likes = likeService.getLikesByUserId(userId);
-        return ResponseEntity.ok(likes);
-    }
+//    @GetMapping("/exists")
+//    public ResponseEntity<Boolean> checkLikeExists(@RequestParam String userId, @RequestParam Long recipeId) {
+//        boolean exists = likeService.checkLikeExists(userId, recipeId);
+//        return ResponseEntity.ok(exists);
+//    }
+//
+//    @GetMapping("/user/{userId}")
+//    public ResponseEntity<List<Like>> getLikesByUserId(@PathVariable String userId) {
+//        List<Like> likes = likeService.getLikesByUserId(userId);
+//        return ResponseEntity.ok(likes);
+//    }
 
     /*******************************
     * jiyeon 구조를 참고하여 좋아요도 구현
