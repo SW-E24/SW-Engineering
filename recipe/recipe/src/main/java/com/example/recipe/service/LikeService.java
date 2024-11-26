@@ -49,9 +49,9 @@ public class LikeService {
     }
 
     public List<Like> getLikesByUserId(String userId) {
-        Member user = memberRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-        // 좋아요 엔티티에 사용자 필드가 있으므로 해당 사용자가 좋아요한 모든 레시피 가져오기
+//        Member user = memberRepository.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+//        return likeRepository.findAllByUserUserId(userId);
         return likeRepository.findAllByUserUserId(userId);
     }
 
