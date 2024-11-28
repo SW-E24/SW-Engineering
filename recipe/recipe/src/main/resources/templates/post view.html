@@ -274,47 +274,65 @@
 
 <script>
   // 로그인 상태에 따라 상단 버튼이 바뀌도록 하는 로직
-  fetch('/api/auth/currentUser', {
-    method: 'GET',
-    credentials: 'same-origin' // 동일한 출처로 쿠키를 포함한 요청
-  })
-          .then(response => {
-            if (response.status === 200) {
-              return response.json(); // 로그인된 사용자 정보 반환
-            } else {
-              throw new Error('로그인된 사용자가 없습니다.');
-            }
-          })
-          .then(data => {
-            // 로그인된 경우 메뉴를 업데이트
-            document.getElementById('loginLink').textContent = '로그아웃';
-            document.getElementById('loginLink').setAttribute('href', '/api/auth/logout');
-            document.getElementById('registerLink').textContent = '마이페이지';
-            document.getElementById('registerLink').setAttribute('href', '/pages/mypage');
+  document.addEventListener("DOMContentLoaded", function() {
+    // 로그인 상태에 따라 상단 버튼이 바뀌도록 하는 로직
+    fetch('/api/auth/currentUser', {
+      method: 'GET',
+      credentials: 'same-origin' // 동일한 출처로 쿠키를 포함한 요청
+    })
+            .then(response => {
+              if (response.status === 200) {
+                return response.json(); // 로그인된 사용자 정보 반환
+              } else {
+                throw new Error('로그인된 사용자가 없습니다.');
+              }
+            })
+            .then(data => {
+              // 로그인된 경우 메뉴를 업데이트
+              document.getElementById('loginLink').textContent = '로그아웃';
+              document.getElementById('loginLink').setAttribute('href', '/api/auth/logout');
+              document.getElementById('registerLink').textContent = '마이페이지';
+              document.getElementById('registerLink').setAttribute('href', '/pages/mypage');
 
-            // 북마크 상태 확인 로직
-            const bookmarkButton = document.getElementById("bookmarkButton");
-            const recipeContainer = document.getElementById('recipeContainer');
-            const recipeId = recipeContainer.getAttribute('data-recipe-id');
-            const userId = data.userId;
+              const bookmarkButton = document.getElementById("bookmarkButton");
+              const likeButton = document.getElementById("likeButton");
+              const recipeContainer = document.getElementById('recipeContainer');
+              const recipeId = recipeContainer.getAttribute('data-recipe-id');
+              const userId = data.userId;
 
-            // 해당 레시피가 이미 북마크되었는지 확인하는 API 호출
-            fetch(`/api/bookmarks/is-bookmarked?userId=${userId}&recipeId=${recipeId}`)
-                    .then(response => response.json())
-                    .then(isBookmarked => {
-                      if (isBookmarked) {
-                        bookmarkButton.classList.add("active"); // 북마크가 되어 있으면 버튼에 active 클래스 추가
-                      } else {
-                        bookmarkButton.classList.remove("active"); // 북마크가 되어 있지 않으면 active 클래스 제거
-                      }
-                    })
-                    .catch(error => {
-                      console.error('북마크 상태 확인 중 오류:', error);
-                    });
-          })
-          .catch(error => {
-            console.log(error); // 에러 출력
-          });
+              // 북마크 상태 확인 로직
+              fetch(`/api/bookmarks/is-bookmarked?userId=${userId}&recipeId=${recipeId}`)
+                      .then(response => response.json())
+                      .then(isBookmarked => {
+                        if (isBookmarked) {
+                          bookmarkButton.classList.add("active"); // 북마크가 되어 있으면 버튼에 active 클래스 추가
+                        } else {
+                          bookmarkButton.classList.remove("active"); // 북마크가 되어 있지 않으면 active 클래스 제거
+                        }
+                      })
+                      .catch(error => {
+                        console.error('북마크 상태 확인 중 오류:', error);
+                      });
+
+              // 좋아요 상태 확인 로직
+              fetch(`/api/likes/is-liked?userId=${userId}&recipeId=${recipeId}`)
+                      .then(response => response.json())
+                      .then(isLiked => {
+                        if (isLiked) {
+                          likeButton.classList.add("active"); // 좋아요가 되어 있으면 버튼에 active 클래스 추가
+                        } else {
+                          likeButton.classList.remove("active"); // 좋아요가 되어 있지 않으면 active 클래스 제거
+                        }
+                      })
+                      .catch(error => {
+                        console.error('좋아요 상태 확인 중 오류:', error);
+                      });
+
+            })
+            .catch(error => {
+              console.log(error); // 에러 출력
+            });
+  });
 
   // 로그아웃 요청 처리 (로그아웃 버튼 클릭 시)
   document.getElementById('loginLink').addEventListener('click', function(event) {
@@ -440,17 +458,31 @@
             .then(data => {
               const userId = data.userId;
 
-              // 좋아요 상태 확인 - toggleLike 사용 시
+              // 좋아요 상태 확인 - 버튼이 'active' 클래스를 가지고 있으면 좋아요가 이미 눌러짐
               const isLiked = likeButton.classList.contains("active");
               const method = isLiked ? 'DELETE' : 'POST'; // 좋아요 토글 처리
 
               // 서버로 좋아요 데이터 전송
-              fetch(`/api/likes?userId=${userId}&recipeId=${recipeId}`, {
+              const like = {
+                user: { userId: userId },
+                recipe: { recipeId: recipeId },
+                date: new Date().toISOString()  // date 추가 (필요시)
+              };
+
+              fetch(`/api/likes`, {
                 method: method,
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(like)
               })
                       .then(response => {
                         if (response.ok) {
-                          likeButton.classList.toggle("active"); // 버튼 상태 업데이트 구현 필요
+                          if (method === 'DELETE') {
+                            likeButton.classList.remove("active"); // 좋아요 취소 시 'active' 클래스를 제거
+                          } else {
+                            likeButton.classList.add("active"); // 좋아요 추가 시 'active' 클래스를 추가
+                          }
                         } else {
                           alert('좋아요 처리 중 오류가 발생했습니다.');
                         }

@@ -49,7 +49,7 @@
         }
 
         /* 북마크 목록 스타일 */
-        .like-list li {
+        .bookmark-list li {
             padding: 10px;
             background-color: #f1f1f1; /* 북마크 목록의 배경 */
             margin-bottom: 10px;
@@ -123,7 +123,7 @@
 <!-- 북마크 목록 -->
 <<div class="container">
     <h2>📌 북마크</h2>
-    <ul id="bookmarkList" class="like-list"></ul>
+    <ul id="bookmarkList" class="bookmark-list"></ul>
 
     <!-- 페이지네이션 -->
     <nav aria-label="Page navigation">
@@ -184,8 +184,8 @@
             }
         })
         .then(data => {
-            const likeList = document.querySelector('.like-list');
-            likeList.innerHTML = ''; // 기존 목록 초기화
+            const likeList = document.querySelector('.bookmark-list');
+            bookmarkList.innerHTML = ''; // 기존 목록 초기화
 
             // 북마크 데이터를 순회하며 필요한 데이터만 HTML에 추가
             data.forEach(bookmark => {
@@ -222,7 +222,7 @@
 
             const recipeLink = document.createElement('a');
             recipeLink.href = `/post view?recipeId=${bookmark.recipe.recipeId}`;  // 레시피 상세 페이지로 이동
-            recipeLink.textContent = `${bookmark.recipe.title} - ${bookmark.recipe.description}`;  // 레시피 제목과 설명
+            recipeLink.textContent = `${bookmark.recipe.title}`;  // 레시피 제목과 설명
             listItem.appendChild(recipeLink);
 
             bookmarkList.appendChild(listItem);

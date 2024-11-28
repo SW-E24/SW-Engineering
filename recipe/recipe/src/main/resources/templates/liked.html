@@ -123,15 +123,15 @@
 <!-- 좋아요 목록 -->
 <div class="container">
     <h2>❤️ 좋아요 목록</h2>
-    <ul class="like-list"> <!-- 좋아요 목록에 클래스 추가 -->
-        <li>게시물 1</li>
-        <li>게시물 2</li>
-        <li>게시물 3</li>
-    </ul>
+    <ul id="likeList" class="like-list"></ul>
+
+    <!-- 페이지네이션 -->
+    <nav aria-label="Page navigation">
+        <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
 
     <!-- 이전 버튼 -->
     <button class="back-btn" onclick="window.history.back()">이전</button>
-
 </div>
 
 <script>
@@ -154,6 +154,9 @@
             document.getElementById('loginLink').setAttribute('href', '/api/auth/logout');
             document.getElementById('registerLink').textContent = '마이페이지';
             document.getElementById('registerLink').setAttribute('href', '/pages/mypage');
+
+            // 좋아요 목록 불러오기
+            loadLikedRecipes(0); // 초기 페이지 (0번) 로드
         })
         .catch(error => {
             console.log(error); // 에러 출력
@@ -172,6 +175,61 @@
                 .catch(error => console.log('로그아웃 실패:', error));
         }
     });
+
+    // 좋아요 목록을 페이지네이션과 함께 불러오는 함수
+    function loadLikedRecipes(page) {
+        fetch(`/api/likes/my-likes-paged?page=${page}&size=5`, {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch liked recipes');
+                return response.json();
+            })
+            .then(data => {
+                renderLikes(data.content); // 데이터 렌더링
+                updatePagination(data.number, data.totalPages); // 페이지네이션 업데이트
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // 좋아요 데이터를 HTML에 렌더링하는 함수
+    function renderLikes(likes) {
+        const likeList = document.getElementById('likeList');
+        likeList.innerHTML = ''; // 기존 목록 초기화
+
+        likes.forEach(like => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+
+            const recipeLink = document.createElement('a');
+            recipeLink.href = `/post view?recipeId=${like.recipe.recipeId}`;  // 레시피 상세 페이지로 이동
+            recipeLink.textContent = `${like.recipe.title}`;  // 레시피 제목과 설명
+            listItem.appendChild(recipeLink);
+
+            likeList.appendChild(listItem);
+        });
+    }
+
+    // 페이지네이션을 업데이트하는 함수
+    function updatePagination(currentPage, totalPages) {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        for (let i = 0; i < totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.textContent = i + 1;
+            a.href = '#';
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadLikedRecipes(i); // 클릭한 페이지의 좋아요 목록 불러오기
+            });
+            li.appendChild(a);
+            pagination.appendChild(li);
+        }
+    }
 </script>
 </body>
 </html>
