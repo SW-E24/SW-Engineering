@@ -66,9 +66,19 @@
             height: 150px;
             object-fit: cover;
         }
-        .profile-header h2 {
-            margin-top: 20px;
+        .profile-header h2#user-nickname {
+            font-size: 20px; /* 닉네임 글씨 크기 */
+            font-weight: bold; /* 닉네임 글씨 굵기 */
+            margin-bottom: 5px; /* 등급과 닉네임 간격 좁힘 */
         }
+
+        .profile-header h2#user-grade {
+            font-size: 16px; /* 등급 글씨 크기 */
+            font-weight: 400; /* 등급 글씨 굵기 */
+            color: gray; /* 등급 글씨 색상 */
+            margin-top: 0;
+        }
+
         .mypage-buttons {
             margin-top: 30px;
             display: flex;
@@ -111,19 +121,20 @@
         <li><a href="/pages/board">게시판</a></li>
     </ul>
 
-        <!-- 오른쪽 메뉴 (로그인, 회원가입) -->
-        <ul id="loginMenu">
-            <li><a href="/pages/login" id="loginLink">로그인</a></li>
-            <li><a href="/pages/register" id="registerLink">회원가입</a></li>
-        </ul>
+    <!-- 오른쪽 메뉴 (로그인, 회원가입) -->
+    <ul id="loginMenu">
+        <li><a href="/pages/login" id="loginLink">로그인</a></li>
+        <li><a href="/pages/register" id="registerLink">회원가입</a></li>
+    </ul>
 </div>
 
 <div class="mypage-container">
     <div class="profile-header">
-        <img src="https://via.placeholder.com/150" alt="프로필 이미지">
-        <h2>닉네임</h2>
-        <p>등급: 일반 회원</p>
+        <img id="user-profile-pic" src="https://via.placeholder.com/150" alt="프로필 이미지">
+        <h2 id="user-nickname">닉네임</h2>
+        <h2 id="user-grade"></h2>
     </div>
+
 
     <div class="mypage-buttons">
         <a href="/pages/profile" class="signup-button">회원 정보 수정</a>
@@ -173,6 +184,67 @@
                 .catch(error => console.log('로그아웃 실패:', error));
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/auth/currentUser', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('로그인이 필요합니다.');
+                }
+            })
+            .then(user => {
+                // 닉네임 업데이트
+                document.getElementById('user-nickname').textContent = user.userName;
+
+                // 등급 정보 업데이트
+                fetch(`/api/grades/${user.userId}`, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                })
+                    .then(gradeResponse => gradeResponse.json())
+                    .then(grade => {
+                        const gradeMapping = {
+                            BASIC: 'basic',
+                            ONE: '1',
+                            ONE_PLUS: '1+',
+                            ONE_PLUS_PLUS: '1++'
+                        };
+                        const userGrade = gradeMapping[grade.grade] || '등급 정보 없음';
+                        document.getElementById('user-grade').textContent = `등급: ${userGrade}`;
+                    });
+
+                // 프로필 이미지 불러오기
+                fetch(`/api/users/${user.userId}/profile-picture`, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                })
+                    .then(imageResponse => {
+                        if (imageResponse.ok) {
+                            return imageResponse.blob(); // 이미지 데이터를 Blob으로 가져옴
+                        } else {
+                            throw new Error('프로필 이미지를 가져올 수 없습니다.');
+                        }
+                    })
+                    .then(blob => {
+                        const imageUrl = URL.createObjectURL(blob);
+                        document.getElementById('user-profile-pic').src = imageUrl; // 프로필 이미지 업데이트
+                    })
+                    .catch(error => {
+                        console.error('프로필 이미지 로드 실패:', error);
+                    });
+            })
+            .catch(error => {
+                console.error('사용자 정보를 가져오는 데 실패했습니다:', error);
+                alert('로그인이 필요합니다.');
+                window.location.href = '/pages/login';
+            });
+    });
+
 </script>
 </body>
 </html>

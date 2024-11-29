@@ -81,11 +81,16 @@
       margin-bottom: 10px;
     }
 
-    .nickname {
-      font-size: 16px;
-      color: #555;
-      text-align: right;
-      margin-bottom: 20px;
+    .comment-nickname {
+      font-weight: bold;
+      margin-bottom: 5px; /* 아이디와 댓글 내용 사이 간격 */
+    }
+
+    .comment-content {
+      display: flex;
+      justify-content: space-between; /* 댓글 내용과 버튼을 양 끝으로 배치 */
+      align-items: center;
+      width: 100%;
     }
 
     .content-section {
@@ -171,20 +176,14 @@
       margin-top: 20px;
     }
 
-    .comment-item {
-      margin-bottom: 15px;
-      padding: 10px;
-      background-color: #f2f1ee;
-      border-radius: 4px;
-    }
-
-    .comment-item .comment-nickname {
+    .comment-nickname {
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 5px; /* 아이디와 댓글 내용 사이 간격 */
     }
-
-    .comment-item .comment-text {
+    .comment-text {
       font-size: 16px;
+      flex: 1; /* 댓글 내용이 공간을 차지하도록 설정 */
+      margin-right: 10px; /* 댓글 내용과 버튼 사이 간격 */
     }
 
     .back-btn {
@@ -195,10 +194,39 @@
       font-size: 14px;
       cursor: pointer;
       border-radius: 4px;
+      margin-left: 20px; /* 약간 왼쪽으로 이동 */
     }
 
     .back-btn:hover {
+      background-color: #e1e1e1;
+    }
+    .comment-item {
+      display: flex;
+      flex-direction: column; /* 아이디와 댓글 내용을 수직으로 정렬 */
+      margin-bottom: 15px;
+      padding: 10px;
       background-color: #f2f1ee;
+      border-radius: 4px;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 5px;
+      margin-left: auto;
+    }
+
+    .comment-actions button {
+      padding: 4px 8px;
+      font-size: 12px;
+      background-color: #fff;
+      color: black;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .comment-actions button:hover {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
@@ -263,19 +291,34 @@
     <h4>댓글</h4>
     <div class="comment-box">
       <input type="text" id="commentInput" placeholder="댓글을 입력하세요">
-      <button onclick="addComment()">등록</button>
+      <button id="addCommentButton">등록</button>
     </div>
     <div class="comments-list" id="commentsList"></div>
   </div>
+
 </div>
 
 <!-- 이전 버튼 -->
 <button class="back-btn" onclick="window.history.back()">이전</button>
 
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const recipeContainer = document.getElementById("recipeContainer");
+    const recipeId = recipeContainer.getAttribute("data-recipe-id");
+
+    // 댓글 등록 버튼 클릭 이벤트 연결
+    const commentButton = document.getElementById("addCommentButton");
+    if (commentButton) {
+      commentButton.addEventListener("click", addComment);
+    }
+
+    // 댓글 로드
+    loadComments(recipeId);
+  });
+
   // 로그인 상태에 따라 상단 버튼이 바뀌도록 하는 로직
   document.addEventListener("DOMContentLoaded", function() {
-    // 로그인 상태에 따라 상단 버튼이 바뀌도록 하는 로직
+
     fetch('/api/auth/currentUser', {
       method: 'GET',
       credentials: 'same-origin' // 동일한 출처로 쿠키를 포함한 요청
@@ -501,48 +544,29 @@
     const commentInput = document.getElementById("commentInput");
     const commentsList = document.getElementById("commentsList");
     const commentCountElement = document.getElementById("commentCount");
+    const recipeContainer = document.getElementById("recipeContainer");
+    const recipeId = recipeContainer.getAttribute("data-recipe-id");
 
     if (commentInput.value.trim() !== "") {
-      // 로그인된 사용자 정보 가져오기
       fetch('/api/auth/currentUser', {
         method: 'GET',
-        credentials: 'same-origin' // 동일한 출처로 쿠키 포함
+        credentials: 'same-origin'
       })
               .then(response => {
-                if (response.status === 200) {
-                  return response.json(); // 로그인된 사용자 정보 반환
-                } else {
+                if (response.status !== 200) {
                   throw new Error('로그인된 사용자가 없습니다.');
                 }
+                return response.json();
               })
-              .then(data => {
-                const userId = data.userId; // 사용자 ID
-                const nickname = data.userName; // 사용자 닉네임
-                const recipeId = document.getElementById('recipeContainer').getAttribute('data-recipe-id'); // 레시피 ID
+              .then(user => {
+                const userId = user.userId;
+                const nickname = user.userName;
+                const newComment = commentInput.value.trim();
 
-                // 댓글 생성
-                const commentItem = document.createElement("div");
-                commentItem.className = "comment-item";
-
-                const nicknameElement = document.createElement("div");
-                nicknameElement.className = "comment-nickname";
-                nicknameElement.textContent = nickname; // 닉네임 표시
-
-                const commentText = document.createElement("div");
-                commentText.className = "comment-text";
-                commentText.textContent = commentInput.value;
-
-                commentItem.appendChild(nicknameElement);
-                commentItem.appendChild(commentText);
-                commentsList.appendChild(commentItem);
-
-                let commentCount = parseInt(commentCountElement.textContent);
-                commentCountElement.textContent = commentCount + 1;
-
-                // 댓글 데이터 서버로 전송 (레시피 ID, 사용자 ID, 댓글 내용)
+                // 서버에 댓글 데이터 전송
                 const commentRequest = {
                   recipeId: recipeId,
-                  content: commentInput.value
+                  content: newComment
                 };
 
                 fetch('/api/comments/create', {
@@ -554,56 +578,171 @@
                 })
                         .then(response => {
                           if (!response.ok) {
-                            alert("댓글 등록 중 오류가 발생했습니다.");
+                            throw new Error('댓글 등록 중 오류가 발생했습니다.');
                           }
+                          return response.json(); // 새로 생성된 댓글 데이터 반환
+                        })
+                        .then(createdComment => {
+                          // DOM에 새 댓글 추가
+                          const commentItem = document.createElement("div");
+                          commentItem.className = "comment-item";
+                          commentItem.setAttribute("data-comment-id", createdComment.commentId);
+
+                          commentItem.innerHTML = `
+              <div class="comment-nickname">${nickname}</div>
+              <div class="comment-text">${newComment}</div>
+              <div class="comment-actions">
+                <button onclick="editComment('${createdComment.commentId}', '${newComment}')">수정</button>
+                <button onclick="deleteComment('${createdComment.commentId}')">삭제</button>
+              </div>
+            `;
+
+                          commentsList.appendChild(commentItem);
+
+                          // 댓글 개수 갱신
+                          const currentCount = parseInt(commentCountElement.textContent, 10);
+                          commentCountElement.textContent = currentCount + 1;
+
+                          // 입력 필드 초기화
+                          commentInput.value = "";
                         })
                         .catch(error => {
-                          console.error("댓글 등록 실패:", error);
+                          console.error('댓글 등록 실패:', error);
+                          alert(error.message || '댓글 등록에 실패했습니다.');
                         });
-
-                commentInput.value = ""; // 댓글 입력창 초기화
               })
               .catch(error => {
-                console.error("사용자 정보 가져오기 실패:", error);
+                console.error('사용자 정보 가져오기 실패:', error);
+                alert(error.message || '사용자 정보를 가져오는 데 실패했습니다.');
               });
+    } else {
+      alert('댓글 내용을 입력해주세요.');
     }
   }
 
-  // 댓글 로딩 함수 (페이지 로드 시 댓글 가져오기)
-  function loadComments() {
-    const recipeId = document.getElementById('recipeContainer').getAttribute('data-recipe-id');
+
+
+  // 댓글 로딩
+  function loadComments(recipeId) {
     fetch(`/api/comments?recipeId=${recipeId}`)
             .then(response => response.json())
             .then(comments => {
               const commentsList = document.getElementById("commentsList");
               commentsList.innerHTML = ""; // 기존 댓글 초기화
-              comments.forEach(comment => {
-                const commentItem = document.createElement("div");
-                commentItem.className = "comment-item";
 
-                const nicknameElement = document.createElement("div");
-                nicknameElement.className = "comment-nickname";
-                nicknameElement.textContent = comment.userName; // 서버에서 닉네임 받아옴
+              fetch('/api/auth/currentUser', { method: 'GET', credentials: 'same-origin' })
+                      .then(response => response.ok ? response.json() : null)
+                      .then(currentUser => {
+                        const currentUserId = currentUser ? currentUser.userId : null;
 
-                const commentText = document.createElement("div");
-                commentText.className = "comment-text";
-                commentText.textContent = comment.content;
+                        comments.forEach(comment => {
+                          const commentItem = document.createElement("div");
+                          commentItem.className = "comment-item";
 
-                commentItem.appendChild(nicknameElement);
-                commentItem.appendChild(commentText);
-                commentsList.appendChild(commentItem);
+                          const isOwner = currentUserId && currentUserId === comment.userId;
+
+                          commentItem.innerHTML = `
+              <div>
+                <div class="comment-nickname">${comment.userName}</div>
+                <div class="comment-text">${comment.content}</div>
+              </div>
+              ${
+                                  isOwner
+                                          ? `<div class="comment-actions">
+                      <button onclick="editComment('${comment.commentId}', '${comment.content}')">수정</button>
+                      <button onclick="deleteComment('${comment.commentId}')">삭제</button>
+                    </div>`
+                                          : ""
+                          }
+            `;
+                          commentsList.appendChild(commentItem);
+                        });
+                      });
+            })
+            .catch(error => console.error("댓글 로드 오류:", error));
+  }
+
+
+
+  // 댓글 수정 함수
+  function editComment(commentId, currentContent) {
+    // 현재 사용자 정보를 가져오기
+    fetch('/api/auth/currentUser', {
+      method: 'GET',
+      credentials: 'same-origin' // 동일 출처 요청 (쿠키 포함)
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('로그인된 사용자가 없습니다.');
+              }
+              return response.json(); // JSON 형태의 사용자 정보 반환
+            })
+            .then(user => {
+              const userId = user.userId; // 현재 로그인된 사용자 ID
+              const newContent = prompt("댓글을 수정하세요:", currentContent); // 새 댓글 내용 입력받기
+
+              if (newContent === null || newContent.trim() === "") {
+                alert("수정된 내용이 비어 있습니다.");
+                return; // 수정 취소 시 함수 종료
+              }
+
+              // 서버에 수정 요청 보내기
+              return fetch(`/api/comments/${commentId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  userId: userId, // 사용자 ID 추가
+                  content: newContent // 수정할 댓글 내용
+                })
               });
+            })
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(error => {
+                  throw new Error(error.message || "댓글 수정 요청이 실패했습니다.");
+                });
+              }
+              return response.json(); // 성공 시 수정된 데이터 반환
+            })
+            .then(data => {
+              console.log("수정된 댓글 응답 데이터:", data);
+              alert("댓글이 성공적으로 수정되었습니다.");
 
-              const commentCountElement = document.getElementById("commentCount");
-              commentCountElement.textContent = comments.length; // 댓글 수 업데이트
+              // 댓글 목록 다시 로드
+              const recipeId = document.getElementById("recipeContainer").getAttribute("data-recipe-id");
+              loadComments(recipeId); // 댓글 새로고침
             })
             .catch(error => {
-              console.error("댓글 로딩 실패:", error);
+              console.error("댓글 수정 중 오류:", error.message || error);
+              alert(error.message || "댓글 수정에 실패했습니다.");
             });
   }
 
-  // 페이지 로드 시 댓글 로드
-  loadComments();
+
+
+
+  // 댓글 삭제
+  function deleteComment(commentId) {
+    fetch('/api/auth/currentUser', { method: 'GET', credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(user => {
+              const userId = user.userId; // 로그인된 사용자 ID 가져오기
+              return fetch(`/api/comments/${commentId}?userId=${userId}`, {
+                method: 'DELETE',
+              });
+            })
+            .then(response => {
+              if (response.ok) {
+                const recipeId = document.getElementById("recipeContainer").getAttribute("data-recipe-id");
+                loadComments(recipeId);
+              } else {
+                alert("댓글 삭제 실패");
+              }
+            })
+            .catch(console.error);
+  }
 
 </script>
 
