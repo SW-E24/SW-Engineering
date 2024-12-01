@@ -14,7 +14,7 @@ public class Like {
     private Member user; // 작성한 사용자 (FK)
 
     @ManyToOne
-    @JoinColumn(name = "recipe_id")
+    @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe; // 어느 게시물에 달린 좋아요인지 (FK)
 
     private Long commentId; // 어느 댓글에 달린 좋아요인지 (FK)

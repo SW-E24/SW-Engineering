@@ -15,7 +15,7 @@ public class Bookmark {
     private Member user; // 북마크 한 사용자 (FK)
 
     @ManyToOne
-    @JoinColumn(name = "recipe_id")
+    @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe; // 어느 게시글 북마크 한 건지 (FK)
 
     private LocalDateTime date; // 북마크 한 시간
