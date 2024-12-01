@@ -299,7 +299,7 @@
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const currentPassword = document.getElementById('current-password').value.trim();
-        const newPassword = document.getElementById('new-password').value.trim();
+        let newPassword = document.getElementById('new-password').value.trim();
         const confirmPassword = document.getElementById('confirm-password').value.trim();
 
         // 비밀번호 확인 로직
@@ -324,6 +324,11 @@
             document.getElementById('password-error3').textContent = '';
         }
 
+        // 새 비밀번호가 공백인 경우 현재 비밀번호 유지
+        if (!newPassword) {
+            newPassword = currentPassword;
+        }
+
         // 이미지 파일 포함
         const profileImage = document.getElementById('profile-pic-input').files[0];
         const formData = new FormData();
@@ -332,7 +337,7 @@
         formData.append('userName', nickname);
         formData.append('email', email);
         formData.append('phone', phone);
-        formData.append('password', newPassword || currentPassword); // 새 비밀번호가 없으면 현재 비밀번호 사용
+        formData.append('password', newPassword); // 새 비밀번호 또는 현재 비밀번호 사용
 
         console.log('폼 데이터 준비 완료'); // 디버깅용 로그
 
@@ -355,6 +360,7 @@
                 alert('회원 정보 수정 중 오류가 발생했습니다.');
             });
     });
+
 </script>
 
 </body>

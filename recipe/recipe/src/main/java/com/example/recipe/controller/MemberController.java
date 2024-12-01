@@ -57,6 +57,14 @@ public class MemberController {
             HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // 기존 사용자 정보 가져오기
+            Member existingMember = memberService.getUserById(userId);
+
+            // 비밀번호 공백 확인 및 처리
+            if (updatedMember.getPassword() == null || updatedMember.getPassword().trim().isEmpty()) {
+                updatedMember.setPassword(existingMember.getPassword()); // 기존 비밀번호 유지
+            }
+
             memberService.updateUser(userId, updatedMember);
             session.setAttribute("currentUser", updatedMember);
 

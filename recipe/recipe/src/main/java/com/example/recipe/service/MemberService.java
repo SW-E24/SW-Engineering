@@ -49,14 +49,24 @@ public class MemberService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
     }
 
-    public Member updateUser(String userId, Member updatedUser) { //유저 정보 업데이트 메소드
+    public Member updateUser(String userId, Member updatedUser) {
+        // 기존 사용자 정보 가져오기
         Member user = getUserById(userId);
+
+        // 공백 처리: 비밀번호가 null이거나 공백이면 기존 비밀번호 유지
+        if (updatedUser.getPassword() == null || updatedUser.getPassword().trim().isEmpty()) {
+            updatedUser.setPassword(user.getPassword());
+        }
+
+        // 나머지 정보 업데이트
         user.setUserName(updatedUser.getUserName());
         user.setEmail(updatedUser.getEmail());
         user.setPhone(updatedUser.getPhone());
         user.setPassword(updatedUser.getPassword());
-        return memberRepository.save(user);
+
+        return memberRepository.save(user); // 저장
     }
+
 
     public Member getMyPageInfo(String userId) { //내 정보 보기
         return getUserById(userId); // 기존 메서드 활용
