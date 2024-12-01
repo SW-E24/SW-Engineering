@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>레시피 등록</title>
     <style>
         * {
@@ -198,25 +198,25 @@
 <div class="container">
     <div class="form-group">
         <label for="title">제목:</label>
-        <input type="text" id="title" name="title" placeholder="레시피 제목 입력">
+        <input id="title" name="title" placeholder="레시피 제목 입력" type="text">
     </div>
     <div class="form-group">
         <label>카테고리:</label>
         <div class="category-group">
-            <label><input type="radio" name="category" value="한식"> 한식</label>
-            <label><input type="radio" name="category" value="중식"> 중식</label>
-            <label><input type="radio" name="category" value="일식"> 일식</label>
-            <label><input type="radio" name="category" value="양식"> 양식</label>
-            <label><input type="radio" name="category" value="디저트"> 디저트</label>
+            <label><input name="category" type="radio" value="한식"> 한식</label>
+            <label><input name="category" type="radio" value="중식"> 중식</label>
+            <label><input name="category" type="radio" value="일식"> 일식</label>
+            <label><input name="category" type="radio" value="양식"> 양식</label>
+            <label><input name="category" type="radio" value="디저트"> 디저트</label>
         </div>
     </div>
     <div class="form-group">
         <label>재료:</label>
         <div id="ingredient-container">
             <div class="addable-group">
-                <input type="text" placeholder="재료 이름" class="ingredient-name">
-                <input type="text" placeholder="용량 (예: 100g, 한 컵)" class="ingredient-quantity">
-                <button type="button" class="add-btn" onclick="addIngredient()">+</button>
+                <input class="ingredient-name" placeholder="재료 이름" type="text">
+                <input class="ingredient-quantity" placeholder="용량 (예: 100g, 한 컵)" type="text">
+                <button class="add-btn" onclick="addIngredient()" type="button">+</button>
             </div>
         </div>
     </div>
@@ -225,9 +225,9 @@
         <label>조리 방법:</label>
         <div id="step-container">
             <div class="addable-group">
-                <input type="text" placeholder="조리 방법 입력" class="step-description">
-                <input type="file" accept="image/*" class="step-photo">
-                <button type="button" class="add-btn" onclick="addStep()">+</button>
+                <input class="step-description" placeholder="조리 방법 입력" type="text">
+                <input accept="image/*" class="step-photo" type="file">
+                <button class="add-btn" onclick="addStep()" type="button">+</button>
             </div>
         </div>
     </div>
@@ -235,7 +235,6 @@
 
     <!-- 이전 버튼 -->
     <button class="back-btn" onclick="window.history.back()">이전</button>
-
 
     <script>
         // 재료 추가 함수
@@ -281,6 +280,13 @@
 
         // 레시피 등록 함수
         async function registerRecipe() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const recipeId = urlParams.get("recipeId"); // URL에서 recipeId 추출
+
+            // recipeId가 존재하면 수정 모드이므로 등록을 방지
+            if (recipeId) {
+                return; // 함수 종료
+            }
             const title = document.getElementById('title').value.trim();
             const category = document.querySelector('input[name="category"]:checked')?.value;
 
@@ -300,7 +306,6 @@
                     return { description, photo: base64Photo };
                 })
             );
-
             // 서버로 전송할 데이터 생성
             const requestBody = {
                 title,
@@ -320,7 +325,7 @@
 
                 if (response.ok) {
                     alert('레시피가 등록되었습니다!');
-                    window.location.href = `/pages/board`;
+                    window.location.href = '/pages/board';
                 } else {
                     const errorData = await response.json();
                     alert(`레시피 등록에 실패했습니다: ${errorData.message || '알 수 없는 오류'}`);
@@ -330,9 +335,7 @@
                 alert('오류가 발생했습니다.');
             }
         }
-    </script>
 
-    <script>
         // 로그인 상태를 확인하는 fetch 요청
         fetch('/api/auth/currentUser', {
             method: 'GET',
@@ -370,7 +373,205 @@
                     .catch(error => console.log('로그아웃 실패:', error));
             }
         });
-    </script>
 
+        document.addEventListener("DOMContentLoaded", async function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const recipeId = urlParams.get("recipeId");
+
+            if (recipeId) {
+                try {
+                    const response = await fetch(`/api/recipes/${recipeId}`);
+                    if (response.ok) {
+                        const recipe = await response.json();
+
+                        // 제목 및 카테고리 채우기
+                        document.getElementById('title').value = recipe.title;
+                        document.querySelector(`input[name="category"][value="${recipe.category}"]`).checked = true;
+
+                        // 재료 채우기
+                        const ingredientContainer = document.getElementById('ingredient-container');
+                        ingredientContainer.innerHTML = ''; // 기존 데이터 초기화
+                        recipe.ingredients.forEach((ingredient, index) => {
+                            addIngredient(ingredient.name, ingredient.quantity, index === 0);
+                        });
+
+                        // 조리 방법 채우기
+                        const stepContainer = document.getElementById('step-container');
+                        stepContainer.innerHTML = ''; // 기존 데이터 초기화
+                        recipe.steps.forEach((step, index) => {
+                            addStep(step.description, step.photo, index === 0);
+                        });
+
+                        // "등록" 버튼 텍스트를 "수정하기"로 변경
+                        const registerButton = document.querySelector('.register-btn');
+                        registerButton.textContent = "수정하기";
+
+                        // 수정 로직 연결
+                        registerButton.addEventListener("click", () => updateRecipe(recipeId));
+                    } else {
+                        alert("레시피 데이터를 불러오는 데 실패했습니다.");
+                    }
+                } catch (error) {
+                    console.error("레시피 데이터 로드 오류:", error);
+                }
+            }
+        });
+
+        // 기존 재료 및 조리 방법 추가 함수 유지
+        function addIngredient(name = "", quantity = "", isFirst = false) {
+            const ingredientContainer = document.getElementById('ingredient-container');
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'addable-group';
+            newIngredient.innerHTML = `
+        <input type="text" placeholder="재료 이름" class="ingredient-name" value="${name}">
+        <input type="text" placeholder="용량 (예: 100g, 한 컵)" class="ingredient-quantity" value="${quantity}">
+        ${
+                isFirst
+                    ? '<button type="button" class="add-btn" onclick="addIngredient()">+</button>'
+                    : '<button type="button" class="remove-btn" onclick="removeElement(this)">-</button>'
+            }
+    `;
+            ingredientContainer.appendChild(newIngredient);
+        }
+
+        function addStep(description = "", photoData = null, photoName = "", isFirst = false) {
+            const stepContainer = document.getElementById('step-container');
+            const newStep = document.createElement('div');
+            newStep.className = 'addable-group';
+
+            newStep.innerHTML = `
+        <input type="text" placeholder="조리 방법 입력" class="step-description" value="${description}">
+        <input type="file" accept="image/*" class="step-photo">
+        ${
+                isFirst
+                    ? '<button type="button" class="add-btn" onclick="addStep(\'\', null, \'\', false)">+</button>'
+                    : '<button type="button" class="remove-btn" onclick="removeElement(this)">-</button>'
+            }
+    `;
+
+            // 기존 파일 데이터 유지 처리 (화면에 false 표시 제거)
+            if (photoData) {
+                const photoInput = newStep.querySelector('.step-photo');
+                photoInput.setAttribute('data-existing-photo', photoData);
+                photoInput.setAttribute('data-existing-name', photoName);
+            }
+
+            // 컨테이너에 새 요소 추가
+            stepContainer.appendChild(newStep);
+
+            // 첫 번째 요소에만 + 버튼 유지
+            updateAddStepButtons();
+        }
+
+
+        // 새로 추가된 단계에서 버튼 상태를 업데이트하는 함수
+        function updateAddStepButtons() {
+            const steps = document.querySelectorAll('#step-container .addable-group');
+            steps.forEach((step, index) => {
+                const addButton = step.querySelector('.add-btn');
+                const removeButton = step.querySelector('.remove-btn');
+
+                if (index === 0) {
+                    // 첫 번째 단계에는 + 버튼을 표시
+                    if (!addButton) {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'add-btn';
+                        button.textContent = '+';
+                        button.setAttribute('onclick', 'addStep()');
+                        step.appendChild(button);
+                    }
+                    if (removeButton) removeButton.remove(); // 첫 번째 단계에서 - 버튼 제거
+                } else {
+                    // 첫 번째가 아닌 단계는 - 버튼을 표시
+                    if (!removeButton) {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'remove-btn';
+                        button.textContent = '-';
+                        button.setAttribute('onclick', 'removeElement(this)');
+                        step.appendChild(button);
+                    }
+                    if (addButton) addButton.remove(); // 첫 번째가 아닌 단계에서 + 버튼 제거
+                }
+            });
+        }
+
+        // 요소 제거 함수
+        function removeElement(button) {
+            const parent = button.parentElement;
+            parent.remove();
+            updateAddStepButtons(); // 버튼 상태 업데이트
+        }
+
+
+        // 레시피 업데이트 함수
+        async function updateRecipe(recipeId) {
+            const title = document.getElementById('title').value.trim();
+            const category = document.querySelector('input[name="category"]:checked')?.value;
+
+            // 재료 수집
+            const ingredients = Array.from(document.querySelectorAll('.ingredient-name')).map((ingredient, index) => ({
+                name: ingredient.value.trim(),
+                quantity: document.querySelectorAll('.ingredient-quantity')[index]?.value.trim()
+            }));
+
+            // 조리 단계 수집
+            const steps = await Promise.all(
+                Array.from(document.querySelectorAll('.addable-group')).map(async group => {
+                    const description = group.querySelector('.step-description')?.value.trim();
+                    const photoInput = group.querySelector('.step-photo');
+                    const photoFile = photoInput?.files[0];
+                    const existingPhoto = photoInput?.getAttribute('data-existing-photo');
+                    const photoData = photoFile
+                        ? await convertToBase64(photoFile) // 새로 선택된 파일
+                        : existingPhoto; // 기존 파일
+
+                    return {
+                        description,
+                        photo: photoData,
+                    };
+                })
+            );
+
+            const requestBody = {
+                title,
+                category,
+                ingredients,
+                steps,
+                description: "레시피 설명" // 필요시 수정 가능
+            };
+
+            try {
+                const response = await fetch(`/api/recipes/${recipeId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (response.ok) {
+                    alert("레시피가 성공적으로 수정되었습니다!");
+                    window.location.href = `/post view?recipeId=${recipeId}`; // 수정 후 해당 글로 이동
+                } else {
+                    alert("레시피 수정에 실패했습니다.");
+                }
+            } catch (error) {
+                console.error("레시피 수정 오류:", error);
+                alert("오류가 발생했습니다.");
+            }
+        }
+
+        // Base64 변환 함수
+        async function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]); // Base64 데이터 추출
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+
+    </script>
 </body>
 </html>

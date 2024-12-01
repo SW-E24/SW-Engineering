@@ -9,7 +9,7 @@ public class View {
     private Long viewId; // 각 조회수 고유 ID (PK)
 
     @ManyToOne
-    @JoinColumn(name = "recipe_id")
+    @JoinColumn(name = "recipe_id", nullable=false)
     private Recipe recipe; // 어느 게시글의 조회수인지 (FK)
 
     private int countView; // 조회수 수치

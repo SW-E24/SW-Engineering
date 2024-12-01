@@ -15,6 +15,16 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recipeId;
 
+    //cascade 설정
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Bookmark> bookmarks;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Like> likes;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<View> views;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Member user;

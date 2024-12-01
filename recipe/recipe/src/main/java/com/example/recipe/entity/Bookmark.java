@@ -10,12 +10,13 @@ public class Bookmark {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookmarkId; // 각 북마크 한 ID (PK)
 
+
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Member user; // 북마크 한 사용자 (FK)
 
     @ManyToOne
-    @JoinColumn(name = "recipe_id")
+    @JoinColumn(name = "recipe_id", nullable=false)
     private Recipe recipe; // 어느 게시글 북마크 한 건지 (FK)
 
     private LocalDateTime date; // 북마크 한 시간

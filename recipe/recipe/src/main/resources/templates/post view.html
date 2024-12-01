@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>레시피 게시물 보기</title>
   <style>
     * {
@@ -58,7 +58,7 @@
       color: black;
       text-decoration: none;
       font-size: 18px;
-      font_weight: normal;
+      font-weight: normal;
     }
 
     .menu-bar ul li a:hover {
@@ -202,6 +202,7 @@
     .back-btn:hover {
       background-color: #e1e1e1;
     }
+
     .comment-item {
       display: flex;
       flex-direction: column; /* 아이디와 댓글 내용을 수직으로 정렬 */
@@ -268,8 +269,10 @@
     }
 
 
-
   </style>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 
 <body>
@@ -294,28 +297,34 @@
 <!-- 게시물 내용 -->
 <div class="container" id="recipeContainer" th:attr="data-recipe-id=${recipe.recipeId}">
   <div class="title" th:text="${recipe.title}"></div>
-  <div class="nickname" th:text="'작성자: ' + ${recipe.user.userName}"></div> <!-- 작성자 표시 -->
+  <div class="nickname">
+    <span th:text="'작성자: ' + ${recipe.user.userName}"></span>
+    <div class="comment-actions" id="postActions" style="display: none;"></div>
+  </div>
   <div class="content-section">
     <h3>재료</h3>
     <div id="ingredients">
       <div th:each="ingredient, iterStat : ${recipe.ingredients}">
         <span th:text="'재료 ' + ${iterStat.index + 1} + ': ' + ${ingredient.name} + ' - ' + ${ingredient.quantity}"></span>
-        <button type="button"
+        <button onclick="goToPurchase(this)"
                 th:attr="data-ingredient-name=${ingredient.name}"
-                onclick="goToPurchase(this)">구매하러 가기</button>
+                type="button">구매하러 가기
+        </button>
       </div>
     </div>
   </div>
+
 
   <div class="content-section">
     <h3>조리 방법</h3>
     <ol>
       <li th:each="step, indexStat : ${recipe.steps}">
         <p th:text="${step.description}"></p>
-        <img th:if="${step.photo != null}"
+        <img alt="Step Image"
+             class="step-image"
+             th:if="${step.photo != null}"
              th:src="'/image/' + ${recipe.recipeId} + '/' + ${indexStat.index}"
-             alt="Step Image"
-             class="step-image" />
+             th:style="'width: 100%; max-width: 400px; height: auto;'"/>
       </li>
     </ol>
   </div>
@@ -330,7 +339,7 @@
   <div class="comment-section">
     <h4>댓글</h4>
     <div class="comment-box">
-      <input type="text" id="commentInput" placeholder="댓글을 입력하세요">
+      <input id="commentInput" placeholder="댓글을 입력하세요" type="text">
       <button id="addCommentButton">등록</button>
     </div>
     <div class="comments-list" id="commentsList"></div>
@@ -356,9 +365,7 @@
     loadComments(recipeId);
   });
 
-  // 로그인 상태에 따라 상단 버튼이 바뀌도록 하는 로직
-  document.addEventListener("DOMContentLoaded", function() {
-
+  document.addEventListener("DOMContentLoaded", function () {
     fetch('/api/auth/currentUser', {
       method: 'GET',
       credentials: 'same-origin' // 동일한 출처로 쿠키를 포함한 요청
@@ -381,10 +388,10 @@
               const likeButton = document.getElementById("likeButton");
               const recipeContainer = document.getElementById('recipeContainer');
               const recipeId = recipeContainer.getAttribute('data-recipe-id');
-              const userId = data.userId;
+              const currentUserId = data.userId; // 현재 로그인된 사용자 ID
 
               // 북마크 상태 확인 로직
-              fetch(`/api/bookmarks/is-bookmarked?userId=${userId}&recipeId=${recipeId}`)
+              fetch(`/api/bookmarks/is-bookmarked?userId=${currentUserId}&recipeId=${recipeId}`)
                       .then(response => response.json())
                       .then(isBookmarked => {
                         if (isBookmarked) {
@@ -398,7 +405,7 @@
                       });
 
               // 좋아요 상태 확인 로직
-              fetch(`/api/likes/is-liked?userId=${userId}&recipeId=${recipeId}`)
+              fetch(`/api/likes/is-liked?userId=${currentUserId}&recipeId=${recipeId}`)
                       .then(response => response.json())
                       .then(isLiked => {
                         if (isLiked) {
@@ -411,10 +418,29 @@
                         console.error('좋아요 상태 확인 중 오류:', error);
                       });
 
+              // 게시글 수정/삭제 버튼 표시 로직 및 디버깅용 데이터 출력
+              fetch(`/api/recipes/${recipeId}`)
+                      .then(response => response.json())
+                      .then(recipe => {
+                        console.log(recipe); // recipe 데이터 구조 확인
+
+                        const postActions = document.getElementById("postActions");
+
+                        // 작성자와 현재 로그인 사용자 비교
+                        const isOwner = currentUserId && currentUserId === recipe.user.userId;
+
+                        if (isOwner) {
+                          // 수정/삭제 버튼 동적으로 생성
+                          postActions.innerHTML = `
+                <button onclick="editPost(${recipeId})">수정</button>
+                <button onclick="deletePost(${recipeId})">삭제</button>
+              `;
+                          postActions.style.display = "block"; // 버튼 표시
+                        }
+                      })
+                      .catch(error => console.error("게시글 데이터 로드 오류:", error));
             })
-            .catch(error => {
-              console.log(error); // 에러 출력
-            });
+            .catch(error => console.error("로그인 사용자 정보 로드 오류:", error));
   });
 
   // 로그아웃 요청 처리 (로그아웃 버튼 클릭 시)
@@ -579,7 +605,7 @@
             });
   }
 
-  // 댓글 추가 기능
+
   // 댓글 추가 기능
   function addComment() {
     const commentInput = document.getElementById("commentInput");
@@ -638,8 +664,6 @@
   }
 
 
-
-
   // 댓글 로딩
   function loadComments(recipeId) {
     fetch(`/api/comments?recipeId=${recipeId}`)
@@ -662,19 +686,19 @@
                           const isOwner = currentUserId && currentUserId === comment.userId;
 
                           commentItem.innerHTML = `
-              <div>
-                <div class="comment-nickname">${comment.userName}</div>
-                <div class="comment-text">${comment.content}</div>
-              </div>
-              ${
+                <div>
+                  <div class="comment-nickname">${comment.userName}</div>
+                  <div class="comment-text">${comment.content}</div>
+                </div>
+                ${
                                   isOwner
                                           ? `<div class="comment-actions">
-                      <button onclick="editComment('${comment.commentId}', '${comment.content}')">수정</button>
-                      <button onclick="deleteComment('${comment.commentId}')">삭제</button>
-                    </div>`
+                        <button onclick="editComment('${comment.commentId}', '${comment.content}')">수정</button>
+                        <button onclick="deleteComment('${comment.commentId}')">삭제</button>
+                      </div>`
                                           : ""
                           }
-            `;
+              `;
                           commentsList.appendChild(commentItem);
                         });
 
@@ -684,9 +708,6 @@
             })
             .catch(error => console.error("댓글 로드 오류:", error));
   }
-
-
-
 
   // 댓글 수정 함수
   function editComment(commentId, currentContent) {
@@ -745,8 +766,6 @@
   }
 
 
-
-
   // 댓글 삭제
   function deleteComment(commentId) {
     fetch('/api/auth/currentUser', { method: 'GET', credentials: 'same-origin' })
@@ -766,6 +785,56 @@
               }
             })
             .catch(console.error);
+  }
+
+  // 게시글 수정 버튼 클릭 시 post-register.html로 이동
+  function editPost(recipeId) {
+    window.location.href = `/recipes/create?recipeId=${recipeId}`;
+  }
+
+  function deletePost(recipeId) {
+    // 현재 로그인한 사용자 정보 가져오기
+    fetch('/api/auth/currentUser', { method: 'GET', credentials: 'same-origin' })
+            .then(response => {
+              if (!response.ok) throw new Error('로그인된 사용자가 없습니다.');
+              return response.json();
+            })
+            .then(user => {
+              if (confirm("정말로 삭제하시겠습니까?")) {
+                console.log(`Deleting recipe with ID: ${recipeId}`); // 디버깅용 로그
+
+                // 삭제 요청
+                fetch(`/api/recipes/${recipeId}`, {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  credentials: "same-origin", // 쿠키 포함
+                })
+                        .then(response => {
+                          if (!response.ok) {
+                            // 서버에서 반환한 오류 메시지를 출력
+                            return response.text().then(errorMessage => {
+                              console.error("서버 응답 오류:", errorMessage);
+                              alert(`게시물 삭제 실패: ${errorMessage}`);
+                            });
+                          }
+                          // 성공 처리
+                          alert("게시물이 삭제되었습니다.");
+                          window.location.href = "/pages/board"; // 게시판 페이지로 이동
+                        })
+                        .catch(error => {
+                          // 클라이언트 측 네트워크 오류 또는 Fetch 관련 오류 처리
+                          console.error("게시물 삭제 중 오류:", error.message || error);
+                          alert("삭제 처리 중 문제가 발생했습니다. 네트워크를 확인하세요.");
+                        });
+              }
+            })
+            .catch(error => {
+              // 사용자 정보 가져오기 실패 처리
+              console.error("사용자 정보 가져오기 실패:", error.message || error);
+              alert("로그인된 사용자 정보를 가져오는 데 실패했습니다.");
+            });
   }
 
 </script>
