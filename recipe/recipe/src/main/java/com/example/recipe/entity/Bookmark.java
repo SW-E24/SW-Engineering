@@ -11,7 +11,7 @@ public class Bookmark {
     private Long bookmarkId; // 각 북마크 한 ID (PK)
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Member user; // 북마크 한 사용자 (FK)
 
     @ManyToOne

@@ -10,7 +10,7 @@ public class Like {
     private Long likeId; // 각 댓글 고유 ID (PK)
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Member user; // 작성한 사용자 (FK)
 
     @ManyToOne

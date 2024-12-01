@@ -1,5 +1,6 @@
 package com.example.recipe.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -8,7 +9,10 @@ public class Grade {
     @Id
     // 속성 정의
     private String userID;
+
+    @Column(nullable = false)
     private GradeType grade;
+
     private int postCount;
     private int commentCount;
 

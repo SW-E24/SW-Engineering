@@ -29,7 +29,7 @@ public class Recipe {
     private List<View> views;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Member user;
 
     @Column(length = 300, nullable = false)
