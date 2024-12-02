@@ -13,7 +13,5 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<Bookmark> findAllByUserUserId(String userId);
     //void deleteByUserUserIdAndRecipeRecipeId(String userId, Long recipeId);
     Optional<Bookmark> findByUserUserIdAndRecipeRecipeId(String userID, Long recipeId);
-
-    // jiyeon
     Page<Bookmark> findAllByUserUserId(String userId, Pageable pageable);//페이지네이션 적용 메서드
 }

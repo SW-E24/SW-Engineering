@@ -52,7 +52,6 @@ public class BookmarkService {
         bookmarkRepository.delete(bookmark);
     }
 
-    // jiyeon
     //페이지네이션
     public Page<Bookmark> getBookmarksByUserIdWithPaging(String userId, Pageable pageable) {
         return bookmarkRepository.findAllByUserUserId(userId, pageable);

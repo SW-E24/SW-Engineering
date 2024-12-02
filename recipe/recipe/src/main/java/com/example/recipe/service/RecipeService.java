@@ -72,7 +72,7 @@ public class RecipeService {
         recipeRepository.deleteById(recipeId);
     }
 
-    // jiyeon 페이지네이션
+    //페이지네이션
     public Page<Recipe> getRecipesByUserIdPaged(String userId, Pageable pageable) {
         return recipeRepository.findAllByUserUserId(userId, pageable);
     }

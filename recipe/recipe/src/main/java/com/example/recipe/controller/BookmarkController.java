@@ -45,9 +45,6 @@ public class BookmarkController {
     }
     */
 
-    /*********
-    * jiyeon
-    * ********/
     // 북마크 객체를 받아와서 삭제
     @DeleteMapping
     public ResponseEntity<Void> removeBookmark(@RequestBody Bookmark bookmark) {

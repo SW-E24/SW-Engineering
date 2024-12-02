@@ -95,9 +95,6 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    /*********
-    * jiyeon
-    * ********/
     // 로그인한 사용자가 작성한 댓글을 페이지네이션으로 가져오기
     @GetMapping("/my-comments-paged")
     public ResponseEntity<Page<Comment>> getUserCommentsPaged(

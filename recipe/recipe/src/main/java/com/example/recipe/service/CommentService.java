@@ -63,7 +63,6 @@ public class CommentService {
         return commentRepository.findAllByUserId(userId);
     }
 
-    // jiyeon
     // 로그인한 사용자가 작성한 댓글을 페이지네이션하여 가져오기
     public Page<Comment> getCommentsByUserIdPaged(String userId, Pageable pageable) {
         return commentRepository.findAllByUserId(userId, pageable);

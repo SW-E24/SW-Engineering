@@ -117,9 +117,6 @@ public class RecipeController {
         return ResponseEntity.ok(recipes);
     }
 
-    /********
-    * jiyeon
-    * *******/
     @GetMapping("/myposts")
     public ResponseEntity<Page<Recipe>> getMyPosts(
             HttpSession session,
