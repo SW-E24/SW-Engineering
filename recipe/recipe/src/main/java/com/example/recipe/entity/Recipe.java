@@ -28,6 +28,12 @@ public class Recipe {
     @JsonIgnore
     private List<View> views;
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments;
+
+
+
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private Member user;

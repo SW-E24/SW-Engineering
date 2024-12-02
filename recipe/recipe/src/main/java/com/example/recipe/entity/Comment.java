@@ -10,9 +10,13 @@ public class Comment {
     //기본키로 설정되고 자동 id값 생성
     private Long id; //고유 id
 
-    @Column(nullable = false)
-    private Long recipeId;
-    //레시피 id 저장, 반드시 이 필드에 값이 있어야함
+    @Column(name = "recipe_id", nullable = false)
+    private Long recipeId; // 물리적 레시피 ID 저장
+
+    @ManyToOne
+    @JoinColumn(name = "recipe_id", insertable = false, updatable = false)
+    private Recipe recipe; // Recipe 엔티티와의 관계
+
 
     @Column(nullable = false)
     private String userId;
