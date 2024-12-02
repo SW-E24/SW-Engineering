@@ -210,9 +210,9 @@
                     .then(grade => {
                         const gradeMapping = {
                             BASIC: 'basic',
-                            ONE: '1',
-                            ONE_PLUS: '1+',
-                            ONE_PLUS_PLUS: '1++'
+                            ONE: '1🥩',
+                            ONE_PLUS: '1+🥩⭐',
+                            ONE_PLUS_PLUS: '1++🥩⭐⭐'
                         };
                         const userGrade = gradeMapping[grade.grade] || '등급 정보 없음';
                         document.getElementById('user-grade').textContent = `등급: ${userGrade}`;

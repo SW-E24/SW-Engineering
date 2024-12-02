@@ -175,40 +175,53 @@
 
   // 댓글 불러오기 및 페이지네이션
   let currentPage = 0;
-  const loadComments = (page = 0) => {
-    fetch(`/api/comments/my-comments-paged?page=${page}&size=5`)
+
+  function fetchComments(page = 0) {
+    fetch(`/api/comments/my-comments-paged?page=${page}&size=5`, {
+      method: 'GET',
+      credentials: 'same-origin',
+    })
             .then(response => response.json())
             .then(data => {
-              console.log('댓글 데이터:', data);
               renderComments(data.content);
-              updatePagination(data.number, data.totalPages);
+              renderPagination(data.number, data.totalPages);
             })
-            .catch(error => console.log('Error:', error));
-  };
+            .catch(error => console.error('Error:', error));
+  }
 
-  const renderComments = (comments) => {
+  function renderComments(comments) {
     const commentList = document.getElementById('commentList');
     commentList.innerHTML = '';
     comments.forEach(comment => {
       const listItem = document.createElement('li');
-      listItem.textContent = `${comment.content}`;
+      listItem.className = 'list-group-item';
+
+      // 댓글 내용을 링크로 설정하여 recipeId와 연결
+      listItem.innerHTML = `
+            <a href="/post view?recipeId=${comment.recipeId}">
+                ${comment.content}
+            </a>
+        `;
+
       commentList.appendChild(listItem);
     });
   }
 
-  const updatePagination = (currentPage, totalPages) => {
+  function renderPagination(currentPage, totalPages) {
     const pagination = document.getElementById('pagination');
     pagination.innerHTML = '';
     for (let i = 0; i < totalPages; i++) {
-      const button = document.createElement('button');
-      button.textContent = i + 1;
-      button.disabled = i === currentPage;
-      button.addEventListener('click', () => loadComments(i));
-      pagination.appendChild(button);
+      const pageItem = document.createElement('li');
+      pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+      pageItem.innerHTML = `<a class="page-link" href="#">${i + 1}</a>`;
+      pageItem.addEventListener('click', () => fetchComments(i));
+      pagination.appendChild(pageItem);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => loadComments(currentPage));
+  // DOM 로드 완료 시 초기 댓글 로드
+  document.addEventListener('DOMContentLoaded', () => fetchComments(currentPage));
+
 </script>
 
 </body>

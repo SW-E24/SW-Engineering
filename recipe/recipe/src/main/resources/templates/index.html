@@ -13,13 +13,47 @@
 
    <!-- 사용자 정의 스타일시트 -->
    <style>
+      .pagination-custom {
+         background-color: #ffffff; /* 버튼 배경 흰색 */
+         color: #b0b0b0; /* 텍스트 색 연한 회색 */
+         border: 1px solid #dcdcdc; /* 테두리 연한 회색 */
+         padding: 6px 10px; /* 버튼 크기 줄임 */
+         border-radius: 6px; /* 모서리 둥글게 */
+         transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* 애니메이션 효과 */
+         margin: 0 3px; /* 버튼 간 간격 줄임 */
+         cursor: pointer;
+         display: inline-block; /* 인라인 블록으로 표시 */
+         font-size: 13px; /* 글씨 크기 줄임 */
+      }
+
+      .pagination-custom:hover {
+         background-color: #f9f9f9; /* 호버 시 약간 밝은 흰색 배경 */
+         color: #888888; /* 호버 시 텍스트 약간 더 진한 회색 */
+         border-color: #c0c0c0; /* 호버 시 테두리 색 약간 더 진한 회색 */
+      }
+
+      .pagination-custom.active {
+         background-color: #f0f0f0; /* 활성화된 버튼 배경 밝은 회색 */
+         color: #707070; /* 활성화된 버튼 텍스트 색 진한 회색 */
+         border-color: #d0d0d0; /* 활성화된 버튼 테두리 색 */
+         pointer-events: none; /* 클릭 비활성화 */
+      }
+
+      .pagination-custom.disabled {
+         background-color: #ffffff; /* 비활성화된 버튼 배경 흰색 */
+         color: #e0e0e0; /* 비활성화된 버튼 텍스트 연한 회색 */
+         border-color: #e0e0e0; /* 비활성화된 버튼 테두리 연한 회색 */
+         pointer-events: none; /* 클릭 비활성화 */
+         cursor: not-allowed; /* 마우스 커서 변경 */
+      }
+
       .banner {
          background-color: #ffe69b;
          text-align: center;
          padding: 100px 0;
          font-size: 36px;
          font-weight: bold;
-         color: #F1EFE9;
+         color: white;
       }
 
       .menu-bar {
@@ -114,6 +148,7 @@
          align-items: center;
          background-color: #F1EFE9;
       }
+
 
       .board-left img {
          max-width: 100%;
@@ -238,6 +273,26 @@
          font-weight: bold;
          cursor: pointer;
       }
+      .footer-box {
+         background-color: #ffffff; /* 흰색 배경 */
+         border: none; /* 테두리 제거 */
+         border-radius: 0; /* 둥근 모서리 제거 */
+         padding: 20px; /* 충분한 내부 여백 */
+         margin-top: 30px; /* 위쪽 간격 */
+         width: 100%; /* 페이지 너비에 맞게 */
+         text-align: center; /* 텍스트 중앙 정렬 */
+         font-size: 16px; /* 글씨 크기 */
+         color: #666; /* 텍스트 색상 */
+      }
+
+
+
+
+
+
+
+
+
    </style>
 </head>
 
@@ -318,9 +373,34 @@
    </div>
 
    <div class="board-right">
-      <h3>게시판</h3>
+      <h3>전체 게시판</h3>
       <ul id="boardContainer"></ul>
    </div>
+</div>
+
+<!-- 흰색 박스 추가 -->
+<div class="footer-box">
+   <p></p>
+</div>
+<!-- 페이지네이션 -->
+<nav aria-label="Page navigation" th:if="${totalPages > 0}">
+   <ul class="pagination">
+      <!-- << 맨 처음 버튼 -->
+      <li class="page-item" th:classappend="${currentPage <= 1} ? 'disabled'">
+         <a class="page-link" th:href="@{/category/dessert(category=${selectedCategory}, page=1, size=5)}">&laquo;</a>
+      </li>
+      <!-- 페이지 번호 버튼 -->
+      <li class="page-item" th:each="page : ${#numbers.sequence(1, totalPages)}" th:classappend="${page == currentPage} ? 'active'">
+         <a class="page-link" th:href="@{/category/dessert(category=${selectedCategory}, page=${page}, size=5)}" th:text="${page}"></a>
+      </li>
+      <!-- >> 맨 마지막 버튼 -->
+      <li class="page-item" th:classappend="${currentPage >= totalPages} ? 'disabled'">
+         <a class="page-link" th:href="@{/category/dessert(category=${selectedCategory}, page=${totalPages}, size=5)}">&raquo;</a>
+      </li>
+   </ul>
+</nav>
+
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -329,38 +409,104 @@
 <script src="/scripts.js"></script>
 
 <script>
-   // 전체 게시글 목록
    document.addEventListener("DOMContentLoaded", function () {
       const boardContainer = document.getElementById("boardContainer");
+      const paginationContainer = document.createElement("div");
+      paginationContainer.id = "paginationContainer";
+      paginationContainer.style.marginTop = "20px";
+      boardContainer.parentElement.appendChild(paginationContainer);
 
-      // RecipeController의 /api/recipes API 호출
-      fetch('/api/recipes')
-              .then(response => {
-                 if (!response.ok) {
-                    throw new Error(`API 호출 실패: ${response.status}`);
-                 }
-                 return response.json(); // JSON 데이터로 변환
-              })
-              .then(recipes => {
-                 if (recipes.length === 0) {
-                    boardContainer.innerHTML = '<p>게시글이 없습니다.</p>';
-                    return;
-                 }
+      const pageSize = 5; // 한 페이지에 표시할 게시글 수
+      let recipes = []; // 모든 게시글 데이터를 저장
+      let currentPage = 1; // 현재 페이지
 
-                 // 게시글 데이터를 리스트로 렌더링
-                 const recipeList = recipes.map(recipe => `
-      <li>
-         <a href="/post view?recipeId=${recipe.recipeId}">${recipe.title}</a>
-      </li>
-   `).join('');
-                 boardContainer.innerHTML = recipeList;
-              })
+      // 전체 데이터를 서버에서 가져오는 함수
+      function fetchAllRecipes() {
+         fetch('/api/recipes')
+                 .then(response => {
+                    if (!response.ok) {
+                       throw new Error(`API 호출 실패: ${response.status}`);
+                    }
+                    return response.json(); // JSON 데이터로 변환
+                 })
+                 .then(data => {
+                    recipes = data; // 데이터를 메모리에 저장
+                    renderPage(currentPage); // 첫 페이지 렌더링
+                    renderPagination();
+                 })
+                 .catch(error => {
+                    console.error('API 요청 오류:', error);
+                    boardContainer.innerHTML = '<p>게시판 데이터를 불러오는 데 실패했습니다.</p>';
+                 });
+      }
 
-              .catch(error => {
-                 console.error('API 요청 오류:', error);
-                 boardContainer.innerHTML = '<p>게시판 데이터를 불러오는 데 실패했습니다.</p>';
-              });
+      // 현재 페이지 데이터를 렌더링하는 함수
+      function renderPage(page) {
+         const startIndex = (page - 1) * pageSize;
+         const endIndex = startIndex + pageSize;
+         const pageData = recipes.slice(startIndex, endIndex);
+
+         if (pageData.length === 0) {
+            boardContainer.innerHTML = '<p>게시글이 없습니다.</p>';
+            return;
+         }
+
+         const recipeList = pageData.map(recipe => `
+               <li>
+                   <a href="/post view?recipeId=${recipe.recipeId}">${recipe.title}</a>
+               </li>
+           `).join('');
+         boardContainer.innerHTML = recipeList;
+      }
+
+      // 페이지네이션 버튼 생성 함수
+      function renderPagination() {
+         const totalPages = Math.ceil(recipes.length / pageSize); // 전체 페이지 수 계산
+         let paginationHtml = '';
+
+         // << 맨 처음 버튼
+         paginationHtml += `
+        <button class="pagination-custom ${currentPage === 1 ? 'disabled' : ''}"
+                onclick="changePage(1)">&laquo;</button>
+    `;
+
+         // 페이지 번호 버튼
+         for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `
+            <button class="pagination-custom ${i === currentPage ? 'active' : ''}"
+                    onclick="changePage(${i})">${i}</button>
+        `;
+         }
+
+         // >> 맨 마지막 버튼
+         paginationHtml += `
+        <button class="pagination-custom ${currentPage === totalPages ? 'disabled' : ''}"
+                onclick="changePage(${totalPages})">&raquo;</button>
+    `;
+
+         paginationContainer.innerHTML = paginationHtml; // HTML 업데이트
+      }
+
+// 페이지 변경 함수
+      window.changePage = function (page) {
+         const totalPages = Math.ceil(recipes.length / pageSize);
+         if (page < 1 || page > totalPages) return; // 잘못된 페이지 요청 방지
+
+         currentPage = page;
+         renderPage(currentPage); // 현재 페이지 데이터를 렌더링
+         renderPagination(); // 페이지네이션 UI 업데이트
+      };
+
+      // 초기 데이터 로드
+      fetchAllRecipes();
    });
+
+
+
+
+
+
+
 
    function redirectToSearch() {
       const searchInput = document.getElementById('search-input').value;
