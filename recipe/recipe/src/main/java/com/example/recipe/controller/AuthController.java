@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -136,12 +138,45 @@ public class AuthController {
     /********************
      * 로그아웃 로직 처리
      * ******************/
+//    @PostMapping("/logout")
+//    public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
+//        //세션에서 사용자 정보 제거
+//        session.invalidate();
+//
+//        redirectAttributes.addFlashAttribute("logoutMessage", "로그아웃 되었습니다");
+//        return "redirect:/pages/login";
+//    }
+
     @PostMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
-        //세션에서 사용자 정보 제거
-        session.invalidate();
+        try {
+            // 세션 무효화
+            if (session != null) {
+                session.invalidate();
+                log.info("Session invalidated successfully.");
+            } else {
+                log.warn("Session was already null.");
+            }
+        } catch (IllegalStateException e) {
+            log.warn("Session was already invalidated: ", e);
+        } catch (Exception e) {
+            log.error("Unexpected error during logout: ", e);
+            return "error"; // 에러 페이지로 이동
+        }
 
-        redirectAttributes.addFlashAttribute("logoutMessage", "로그아웃 되었습니다");
+        // 로그아웃 메시지 추가
+        if (redirectAttributes != null) {
+            redirectAttributes.addFlashAttribute("logoutMessage", "로그아웃 되었습니다");
+        } else {
+            log.warn("RedirectAttributes is null.");
+        }
+
+        return "redirect:/pages/login"; // 로그인 페이지로 리다이렉트
+    }
+
+    @GetMapping("/logout")
+    public String handleInvalidLogoutMethod() {
+        log.warn("GET method is not supported for /logout. Redirecting to login.");
         return "redirect:/pages/login";
     }
 
