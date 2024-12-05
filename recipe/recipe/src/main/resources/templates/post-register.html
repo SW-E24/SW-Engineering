@@ -287,35 +287,65 @@
             if (recipeId) {
                 return; // 함수 종료
             }
+
             const title = document.getElementById('title').value.trim();
             const category = document.querySelector('input[name="category"]:checked')?.value;
 
             // 재료 수집
-            const ingredients = Array.from(document.querySelectorAll('.ingredient-name')).map((ingredient, index) => ({
-                name: ingredient.value.trim(),
-                quantity: document.querySelectorAll('.ingredient-quantity')[index]?.value.trim()
+            const ingredients = Array.from(document.querySelectorAll('#ingredient-container .addable-group')).map(group => ({
+                name: group.querySelector('.ingredient-name').value.trim(),
+                quantity: group.querySelector('.ingredient-quantity').value.trim()
             }));
 
             // 조리 단계 수집 (설명과 사진 포함)
-            const steps = await Promise.all(
-                Array.from(document.querySelectorAll('.addable-group')).map(async group => {
-                    const description = group.querySelector('.step-description')?.value.trim(); // 조리 방법 설명
-                    const photoInput = group.querySelector('.step-photo'); // 사진 업로드 input
-                    const photoFile = photoInput?.files[0]; // 업로드된 파일
-                    const base64Photo = photoFile ? await convertToBase64(photoFile) : null; // Base64로 변환
-                    return { description, photo: base64Photo };
-                })
+            const steps = Array.from(document.querySelectorAll('#step-container .addable-group')).map(group => {
+                const description = group.querySelector('.step-description').value.trim();
+                const photoInput = group.querySelector('.step-photo');
+                const photoFile = photoInput?.files[0];
+                const photoData = photoFile ? convertToBase64(photoFile) : null;
+
+                return { description, photo: photoData };
+            });
+
+            // Base64 변환을 기다리기 위해 Promise 처리
+            const resolvedSteps = await Promise.all(
+                steps.map(async step => ({
+                    description: step.description,
+                    photo: step.photo instanceof Promise ? await step.photo : step.photo
+                }))
             );
+
+            // 입력값 검증
+            if (!title) {
+                alert('제목을 입력하세요.');
+                return;
+            }
+            if (!category) {
+                alert('카테고리를 선택하세요.');
+                return;
+            }
+            if (ingredients.some(i => !i.name)) {
+                alert('재료를 입력하세요.');
+                return;
+            }
+            if (ingredients.some(i => !i.quantity)) {
+                alert('재료의 용량을 입력하세요.');
+                return;
+            }
+            if (resolvedSteps.some(s => !s.description)) {
+                alert('조리 방법을 입력하세요.');
+                return;
+            }
+
             // 서버로 전송할 데이터 생성
             const requestBody = {
                 title,
                 category,
                 ingredients,
-                steps,
+                steps: resolvedSteps,
                 description: "레시피 설명" // 필요시 수정 가능
             };
 
-            // 서버 요청
             try {
                 const response = await fetch('/api/recipes/create', {
                     method: 'POST',
@@ -327,14 +357,14 @@
                     alert('레시피가 등록되었습니다!');
                     window.location.href = '/pages/board';
                 } else {
-                    const errorData = await response.json();
-                    alert(`레시피 등록에 실패했습니다.`);
+                    alert('레시피 등록에 실패했습니다.');
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alert('오류가 발생했습니다.');
             }
         }
+
 
         // 로그인 상태를 확인하는 fetch 요청
         fetch('/api/auth/currentUser', {
@@ -511,34 +541,59 @@
             const category = document.querySelector('input[name="category"]:checked')?.value;
 
             // 재료 수집
-            const ingredients = Array.from(document.querySelectorAll('.ingredient-name')).map((ingredient, index) => ({
-                name: ingredient.value.trim(),
-                quantity: document.querySelectorAll('.ingredient-quantity')[index]?.value.trim()
+            const ingredients = Array.from(document.querySelectorAll('#ingredient-container .addable-group')).map(group => ({
+                name: group.querySelector('.ingredient-name').value.trim(),
+                quantity: group.querySelector('.ingredient-quantity').value.trim()
             }));
 
             // 조리 단계 수집
-            const steps = await Promise.all(
-                Array.from(document.querySelectorAll('.addable-group')).map(async group => {
-                    const description = group.querySelector('.step-description')?.value.trim();
-                    const photoInput = group.querySelector('.step-photo');
-                    const photoFile = photoInput?.files[0];
-                    const existingPhoto = photoInput?.getAttribute('data-existing-photo');
-                    const photoData = photoFile
-                        ? await convertToBase64(photoFile) // 새로 선택된 파일
-                        : existingPhoto; // 기존 파일
+            const steps = Array.from(document.querySelectorAll('#step-container .addable-group')).map(group => {
+                const description = group.querySelector('.step-description').value.trim();
+                const photoInput = group.querySelector('.step-photo');
+                const photoFile = photoInput?.files[0];
+                const existingPhoto = photoInput?.getAttribute('data-existing-photo');
+                const photoData = photoFile
+                    ? convertToBase64(photoFile) // 새로 선택된 파일
+                    : existingPhoto; // 기존 파일
 
-                    return {
-                        description,
-                        photo: photoData,
-                    };
-                })
+                return { description, photo: photoData };
+            });
+
+            // Base64 변환을 기다리기 위해 Promise 처리
+            const resolvedSteps = await Promise.all(
+                steps.map(async step => ({
+                    description: step.description,
+                    photo: step.photo instanceof Promise ? await step.photo : step.photo
+                }))
             );
+
+            // 입력값 검증
+            if (!title) {
+                alert('제목을 입력하세요.');
+                return;
+            }
+            if (!category) {
+                alert('카테고리를 선택하세요.');
+                return;
+            }
+            if (ingredients.some(i => !i.name)) {
+                alert('재료를 입력하세요.');
+                return;
+            }
+            if (ingredients.some(i => !i.quantity)) {
+                alert('재료의 용량을 입력하세요.');
+                return;
+            }
+            if (resolvedSteps.some(s => !s.description)) {
+                alert('조리 방법을 입력하세요.');
+                return;
+            }
 
             const requestBody = {
                 title,
                 category,
                 ingredients,
-                steps,
+                steps: resolvedSteps,
                 description: "레시피 설명" // 필요시 수정 가능
             };
 
@@ -551,7 +606,7 @@
 
                 if (response.ok) {
                     alert("레시피가 성공적으로 수정되었습니다!");
-                    window.location.href = `/post view?recipeId=${recipeId}`; // 수정 후 해당 글로 이동
+                    window.location.href = `/post view?recipeId=${recipeId}`;
                 } else {
                     alert("레시피 수정에 실패했습니다.");
                 }
@@ -560,6 +615,7 @@
                 alert("오류가 발생했습니다.");
             }
         }
+
 
         // Base64 변환 함수
         async function convertToBase64(file) {
